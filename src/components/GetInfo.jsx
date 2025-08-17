@@ -148,8 +148,8 @@ const GetInfo=() => {
     };
   }, [i]);
 
-  
-  const FIREBASE_URL = "https://resume-builder-6362c-default-rtdb.firebaseio.com/ResumesBuilt.json"; //Prashant
+
+  const FIREBASE_URL = "Enter Firebase URL"; 
 
 
   useEffect(() => {
