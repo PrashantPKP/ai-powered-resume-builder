@@ -14,7 +14,7 @@ import FileUploadPage from './components/FileUploadPage.jsx';
 import Loader from './components/Loader.jsx'
 // import T5 from './components/T5.jsx'
 
-const FIREBASE_URL = "https://resume-builder-6362c-default-rtdb.firebaseio.com/Views.json";
+const FIREBASE_URL = "Enter Firebase URL";
 
 const App = () => {
 
