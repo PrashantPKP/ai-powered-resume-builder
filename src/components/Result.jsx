@@ -24,7 +24,7 @@ const Result = () => {
   const MAX_RETRIES = 3;
   const RETRY_DELAY = 10000; 
 
-  const FIREBASE_URL = "https://resume-builder-6362c-default-rtdb.firebaseio.com/ResumesBuilt.json";
+  const FIREBASE_URL = "Enter Firebase URL";
 
 
   useEffect(() => {
