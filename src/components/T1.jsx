@@ -16,19 +16,33 @@ const StyledWrapper = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 1280px;
+    min-height: 100vh;
   }
   @page {
-   size: 950px 1300px; 
-   margin: 0;
+   size: A4; 
+   margin: 0.5in;
   }
   .resume {
     margin-top: 10px;
     width: 900px; 
+    max-width: 100%;
     border-radius: 15px;
     border: 0px solid #ddd !important;
     padding: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    page-break-inside: avoid;
+  }
+  .section {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  .experience-item, .project-item {
+    page-break-inside: avoid;
+    break-inside: avoid;
+    margin-bottom: 15px;
+  }
+  .page-break {
+    page-break-before: always;
   }
 }
 
@@ -41,18 +55,22 @@ body {
   background-color: #d6cece;
   display: flex;
   justify-content: center;
-  align-items: center;
-  height: 1280px;
+  align-items: flex-start;
+  min-height: 100vh;
+  padding: 20px 0;
 }
 
 .resume {
   margin-top: 10px;
   width: 900px; 
+  max-width: 95%;
   background: #f1f1f1;
   border-radius: 15px;
   border: 1px solid #ddd;
   padding: 20px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  min-height: auto;
+  max-height: none;
 }
 
 .header {
@@ -280,7 +298,7 @@ export const T1 = ({ jsonData }) => {
   ));
 
   const projectsList = jsonData.projects.map((proj, index) => (
-    <div className="Ritem" key={`proj-${index}`}>
+    <div className="Ritem project-item" key={`proj-${index}`}>
       <li>
         <div className="item-title TextLight">{proj.projectTitle}</div>
         <div>{proj.toolsTechUsed}</div>
@@ -289,7 +307,7 @@ export const T1 = ({ jsonData }) => {
   ));
 
   const workExpList = jsonData.workExperience.map((we, index) => (
-    <li key={`work-${index}`}>
+    <li key={`work-${index}`} className="experience-item">
       <div className="item-title TextLight">
         {we.companyName}
         <div>{we.WorkDuration}</div>
@@ -362,7 +380,7 @@ export const T1 = ({ jsonData }) => {
         </div>
 
         <div className="right">
-          <div className="SUsection">
+          <div className="SUsection section">
             <div className="section-title"><b>Projects</b></div>
             <ul>
               {projectsList}

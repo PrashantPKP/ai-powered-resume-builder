@@ -4,6 +4,7 @@ import { Routes, Route } from 'react-router-dom';
 import FrontPage from './components/FrontPage.jsx';
 import GetInfo from './components/GetInfo.jsx';
 import Result from './components/Result.jsx';
+import PreviewPage from './components/PreviewPage.jsx';
 import AboutUs from './components/AboutUs.jsx';
 import { Toaster } from "react-hot-toast";
 import { ThemeContext } from './components/ThemeContext.jsx';
@@ -14,7 +15,7 @@ import FileUploadPage from './components/FileUploadPage.jsx';
 import Loader from './components/Loader.jsx'
 // import T5 from './components/T5.jsx'
 
-const FIREBASE_URL = "Enter Firebase URL";
+const FIREBASE_URL = "https://resume-builder-6362c-default-rtdb.firebaseio.com/Views.json";
 
 const App = () => {
 
@@ -69,6 +70,7 @@ const App = () => {
         <Route path="/FileUploadPage" element={<FileUploadPage />} />
         <Route path="/HTML-PDF" element={<HtmlToPdfConverter />} />
         <Route path="/GetInfo" element={<GetInfo />} />
+        <Route path="/Preview" element={<PreviewPage />} />
         <Route path="/Result" element={<Result />} /> 
         <Route path="/ViewTemplates" element={<ViewTemplates/>} /> 
       </Routes>  

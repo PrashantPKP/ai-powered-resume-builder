@@ -10,21 +10,23 @@ import {T3,T3Css} from './T3.jsx';
 import {T4,T4Css} from './T4.jsx';
 import {T5,T5Css} from './T5.jsx';
 import {T6,T6Css} from './T6.jsx';
+import DownloadModal from './DownloadModal.jsx';
 
 const Result = () => {
   const [status, setStatus] = useState('preparing'); // 'preparing', 'waking', 'processing', 'completed', 'error'
   const [retryCount, setRetryCount] = useState(0);
   const [errorMessage, setErrorMessage] = useState('');
   const [downloadStatus, setDownloadStatus] = useState({ pdf: false, html: false });
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
   const location = useLocation();
   const [isBuilt, setIsBuilt] = useState(false);
-  const { jsonData } = location.state || {};
+  const { jsonData, originalData, versionType } = location.state || {};
   const navigateToDiv = useRef(null);
   const selectedTemplate = jsonData?.selectedTemplate || "1";
   const MAX_RETRIES = 3;
   const RETRY_DELAY = 10000; 
 
-  const FIREBASE_URL = "Enter Firebase URL";
+  const FIREBASE_URL = "https://resume-builder-6362c-default-rtdb.firebaseio.com/ResumesBuilt.json";
 
 
   useEffect(() => {
@@ -36,9 +38,9 @@ const Result = () => {
 
     if (!isBuilt){
       setTimeout(() => {
-        setStatus('waking');
-        generateAndDownloadFiles();
-      }, 1000);
+        setStatus('completed'); // Skip the automatic download and show ready state
+        setIsBuilt(true);
+      }, 1500); // Shorter delay for better UX
     }
   }, [jsonData]);
 
@@ -280,21 +282,23 @@ const Result = () => {
           <div ref={navigateToDiv} className="w-full flex flex-col items-center">
             <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative w-full mb-4 text-left">
               <span className="block sm:inline">
-                Thank you for using our Resume Builder. Your resume is now ready and downloaded. <br />
-                We’re glad to be part of your career journey — feel free to explore more templates anytime!</span>
+                🎉 Your {versionType === 'enhanced' ? 'AI-Enhanced' : 'Original'} resume is ready! Choose your preferred format below to download.
+                {versionType === 'enhanced' && <><br />🤖 This version includes AI improvements: enhanced content, keywords, and professional formatting.</>}
+                {versionType === 'original' && <><br />📝 This is your original resume as you created it.</>}
+              </span>
             </div>
             <div className="flex flex-wrap gap-3 justify-center">
               <button 
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                onClick={handleTryAgain}
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded flex items-center gap-2"
+                onClick={() => setShowDownloadModal(true)}
               >
-                Download Again
+                📄 Choose Download Format
               </button>
               <button 
                 className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
                 onClick={() => window.history.back()}
               >
-                Back to Editor
+                ← Back to Editor
               </button>
             </div>
             <div className="dark:text-gray-200 font-bold">
@@ -306,6 +310,16 @@ const Result = () => {
           </div>
 
           </div>
+        )}
+
+        {/* Download Modal */}
+        {showDownloadModal && (
+          <DownloadModal
+            isOpen={showDownloadModal}
+            onClose={() => setShowDownloadModal(false)}
+            resumeData={jsonData}
+            selectedTemplate={selectedTemplate}
+          />
         )}
       </div>
     </div>

@@ -1,6 +1,6 @@
 
 import React, { useState,useEffect } from 'react';
-import { Check, Plus, ChevronRight, Menu, X ,Eye, FileText } from 'lucide-react';
+import { Check, Plus, ChevronRight, Menu, X ,Eye, FileText, Trash2, Minus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Typed from "typed.js"; 
 import toast from "react-hot-toast";
@@ -13,6 +13,12 @@ import {T3} from './T3.jsx';
 import {T4} from './T4.jsx';
 import {T5} from './T5.jsx';
 import {T6} from './T6.jsx';
+import ChatBot from './ChatBot.jsx';
+import AIAnalysis from './AIAnalysis.jsx';
+import AISuggestions from './AISuggestions.jsx';
+import DatePicker from './DatePicker.jsx';
+import OptionalSection from './OptionalSection.jsx';
+import DownloadModal from './DownloadModal.jsx';
 
 const GetInfo=() => {
   const [currentStep, setCurrentStep]=useState(0);
@@ -24,6 +30,12 @@ const GetInfo=() => {
   const [NextError, setNextError]=useState(false);
   const navigate=useNavigate();
   const [ExampleJsonData, setExampleJsonData]=useState(UserjsonData?UserjsonData:JsonFiles[Math.floor(Math.random() * JsonFiles.length)]);
+  
+  // AI-related state
+  const [isChatBotOpen, setIsChatBotOpen] = useState(false);
+  const [showAIAnalysis, setShowAIAnalysis] = useState(false);
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
+  const [enhancedResumeData, setEnhancedResumeData] = useState(null);
   // console.log('ReceiveData',ExampleJsonData.skills.hardSkills)
   const [formData,setFormData]=useState({
     selectedTemplate: "",
@@ -100,7 +112,7 @@ const GetInfo=() => {
   const [selectTemp, setSelectTemp]=useState(false);
   const AboutTemps=["Simpler and Structured","Linear and Classic","Colourfull and Attractive","Colourful and Highly Designed","Simpler and Linear","Highly Simpler and Classic"]
   const Suggests=[
-    "Hi, I'm here to assist you in building a strong, high-quality, and ATS-friendly resume. Let's make it impressive together! 🤝",
+    "Hi, I'm here to assist you. 🤝",
     "First, start by choosing a template that best fits your style and profession.",
     `You selected template ${Number(formData.selectedTemplate)} which is ${AboutTemps[Number(formData.selectedTemplate) - 1]} ${Number(formData.selectedTemplate) === 4 ? "according to report This template currently has PDF alignment issues 🧐. Please choose a different one you like." : "🤟. Let's move forward and fill in the details (Click Next)." }`,
     "Now, start by filling in your basic details as the form asks. \nDon't worry -- you got suggestions onward which saves much of your time ☺️",
@@ -139,7 +151,7 @@ const GetInfo=() => {
       const timer = setTimeout(() => {
         setI(1);
         setSelectTemp(true)
-      }, 11000);
+      }, 3000);
       return () => clearTimeout(timer);
     }
 
@@ -148,8 +160,8 @@ const GetInfo=() => {
     };
   }, [i]);
 
-
-  const FIREBASE_URL = "Enter Firebase URL"; 
+  
+  const FIREBASE_URL = "https://resume-builder-6362c-default-rtdb.firebaseio.com/ResumesBuilt.json"; //Prashant
 
 
   useEffect(() => {
@@ -316,6 +328,21 @@ const GetInfo=() => {
     }
   };
 
+  const removeItem = (section, index) => {
+    if (!isExampleProcessing) {
+      setFormData(prev => ({
+        ...prev,
+        [section]: prev[section].filter((_, i) => i !== index)
+      }));
+    } else {
+      setExampleJsonData(prev => ({
+        ...prev,
+        [section]: prev[section].filter((_, i) => i !== index)
+      }));
+    }
+    toast.success('Item removed successfully');
+  };
+
   const handleNext=() => {
     const Fields={
       0: [formData.selectedTemplate],
@@ -382,14 +409,29 @@ const GetInfo=() => {
       }
 
       updateResumeCount();
-  
-      navigate('/Result', {
+      
+      // Navigate to preview page instead of showing side panel
+      navigate('/Preview', {
         state: {
-          jsonData: isExampleProcessing ? ExampleJsonData : formData
+          resumeData: isExampleProcessing ? ExampleJsonData : formData,
+          originalData: isExampleProcessing ? ExampleJsonData : formData
         }
       });
-
     }
+  };
+
+  const handleDownload = (downloadData) => {
+    // Navigate to Result page with the selected resume data (original or AI-enhanced)
+    navigate('/Result', {
+      state: {
+        jsonData: downloadData,
+        originalData: getCurrentResumeData() // Keep reference to original data
+      }
+    });
+  };
+
+  const getCurrentResumeData = () => {
+    return isExampleProcessing ? ExampleJsonData : formData;
   };
   
 
@@ -589,7 +631,18 @@ const GetInfo=() => {
               <p className='font-semibold mb-6 text-gray-600 dark:text-gray-200'>Hint: Add atleast 2 work Experiences from previous companies. as internship or full time job</p>
               {formData.workExperience.map((exp, index) => (
                 <div key={index} className="p-4 border-2 rounded space-y-4 dark:border-slate-700">
-                  <h3 className="font-medium text-lg dark:text-slate-200">Experience {index + 1}</h3>
+                  <div className="flex justify-between items-center">
+                    <h3 className="font-medium text-lg dark:text-slate-200">Experience {index + 1}</h3>
+                    {formData.workExperience.length > 1 && (
+                      <button
+                        onClick={() => removeItem('workExperience', index)}
+                        className="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                        title="Delete this experience"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    )}
+                  </div>
 
                     <div className="space-y-2">
                       <div className='peer'>
@@ -777,12 +830,35 @@ const GetInfo=() => {
         if (!isExampleProcessing){
           {(i===11 || i===10) && setI(12)}
           return (
-            <div className="space-y-4">
-              <h2 className="text-xl sm:text-2xl font-bold border-b-4 pb-1 border-blue-900 text-blue-800 dark:border-blue-500 dark:text-blue-400">Projects</h2>
-              <p className='font-semibold mb-6 text-gray-600 dark:text-gray-200'>Hint: Add {formData.workExperience.length>2?'at-last':'atleast'} {5-formData.workExperience.length} projects which you did in your Academics / WorkLife</p>
+            <OptionalSection
+              sectionType="projects"
+              sectionTitle="Projects"
+              sectionDescription="Showcase your practical work and technical accomplishments"
+              userProfile={{
+                jobTitle: formData.contactInfo.jobTitle,
+                hasExperience: formData.workExperience.some(exp => exp.jobTitle)
+              }}
+              onSkip={() => {
+                setCurrentStep(currentStep + 1);
+              }}
+            >
+              <div className="space-y-4">
+                <h2 className="text-xl sm:text-2xl font-bold border-b-4 pb-1 border-blue-900 text-blue-800 dark:border-blue-500 dark:text-blue-400">Projects</h2>
+                <p className='font-semibold mb-6 text-gray-600 dark:text-gray-200'>Hint: Add {formData.workExperience.length>2?'at-last':'atleast'} {5-formData.workExperience.length} projects which you did in your Academics / WorkLife</p>
               {formData.projects.map((project, index) => (
                 <div key={index} className="p-4 border-2 rounded space-y-4 dark:border-slate-700">
-                  <h3 className="font-medium text-lg dark:text-slate-200">Project {index + 1}</h3>
+                  <div className="flex justify-between items-center">
+                    <h3 className="font-medium text-lg dark:text-slate-200">Project {index + 1}</h3>
+                    {formData.projects.length > 1 && (
+                      <button
+                        onClick={() => removeItem('projects', index)}
+                        className="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                        title="Delete this project"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    )}
+                  </div>
 
                     <div className="space-y-2">
                       <label className="block text-sm font-medium dark:text-slate-300">Project Title</label>
@@ -828,9 +904,10 @@ const GetInfo=() => {
                     : "bg-blue-600 hover:bg-blue-700"}`}>
                 <Plus size={16} /> Add Projects
               </button>
-            </div>
+              </div>
+            </OptionalSection>
           );
-        }else{
+        } else {
           return (
             <div className="space-y-4">
               <h2 className="text-xl sm:text-2xl font-bold border-b-4  pb-1 border-blue-900 text-blue-800 dark:border-blue-500 dark:text-blue-400">Projects</h2>
@@ -896,7 +973,18 @@ const GetInfo=() => {
                 <p className='font-semibold mb-6 text-gray-600 dark:text-gray-200'>Hint: Add your pre/post graduations on different sections (Consider listing your most recent Qualifications first)</p>
                 {formData.education.map((edu, index) => (
                   <div key={index} className="p-4 border-2 rounded space-y-4 dark:border-slate-700">
-                    <h3 className="font-medium text-lg dark:text-slate-200">Education {index + 1}</h3>
+                    <div className="flex justify-between items-center">
+                      <h3 className="font-medium text-lg dark:text-slate-200">Education {index + 1}</h3>
+                      {formData.education.length > 1 && (
+                        <button
+                          onClick={() => removeItem('education', index)}
+                          className="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                          title="Delete this education"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                      )}
+                    </div>
 
                     <div className="space-y-2">
                       <div className="peer">
@@ -1239,12 +1327,36 @@ const GetInfo=() => {
         if (!isExampleProcessing){
           {(i===16 || i===15) && setI(17)}
           return (
-            <div className="space-y-4">
-              <h2 className="text-xl sm:text-2xl font-bold border-b-4 pb-1 border-blue-900 mb-4 text-blue-800 dark:border-blue-500 dark:text-blue-400">Certificates</h2>
-              <p className='font-semibold mb-6 text-gray-600 dark:text-gray-200'>Hint: Add atleast 5 high rated certificates</p>
+            <OptionalSection
+              sectionType="certificates"
+              sectionTitle="Certificates"
+              sectionDescription="Professional certifications that validate your expertise"
+              userProfile={{
+                jobTitle: formData.contactInfo.jobTitle,
+                hasExperience: formData.workExperience.some(exp => exp.jobTitle)
+              }}
+              onSkip={() => {
+                // Move to next step
+                setCurrentStep(currentStep + 1);
+              }}
+            >
+              <div className="space-y-4">
+                <h2 className="text-xl sm:text-2xl font-bold border-b-4 pb-1 border-blue-900 mb-4 text-blue-800 dark:border-blue-500 dark:text-blue-400">Certificates</h2>
+                <p className='font-semibold mb-6 text-gray-600 dark:text-gray-200'>Hint: Add atleast 5 high rated certificates</p>
               {formData.certificates.map((cert, index) => (
                 <div key={index} className="p-4 border-2 rounded space-y-4 dark:border-slate-700">
-                  <h3 className="font-medium text-lg dark:text-slate-200">Certificate {index + 1}</h3>
+                  <div className="flex justify-between items-center">
+                    <h3 className="font-medium text-lg dark:text-slate-200">Certificate {index + 1}</h3>
+                    {formData.certificates.length > 1 && (
+                      <button
+                        onClick={() => removeItem('certificates', index)}
+                        className="text-red-500 hover:text-red-700 p-2 rounded-full hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                        title="Delete this certificate"
+                      >
+                        <Trash2 size={16} />
+                      </button>
+                    )}
+                  </div>
                   <div className="space-y-4">
 
                     <div className="space-y-2">
@@ -1305,9 +1417,10 @@ const GetInfo=() => {
                     : "bg-blue-600 hover:bg-blue-700"}`}                >
                 <Plus size={16} /> Add Certifications
               </button>
-            </div>
+              </div>
+            </OptionalSection>
           );
-        }else{
+        } else {
           return (
             <div className="space-y-4">
               <h2 className="text-xl sm:text-2xl font-bold border-b-4 pb-1 border-blue-900 mb-4 text-blue-800 dark:border-blue-500 dark:text-blue-400">Certificates</h2>
@@ -1404,6 +1517,21 @@ const GetInfo=() => {
                     <p className="font-semibold mb-6 text-gray-600 dark:text-gray-200">
                       Hint: Consider to edit them more and make professional
                     </p>
+
+                    {/* AI Suggested Description Section */}
+                    <div className="mb-6">
+                      <h3 className="text-lg font-semibold text-blue-800 dark:text-blue-400 mb-3">
+                        🤖 AI Suggested Description
+                      </h3>
+                      <AISuggestions
+                        jobTitle={formData.contactInfo.jobTitle}
+                        skills={formData.skills.hardSkills}
+                        experienceLevel="mid"
+                        onApplySuggestion={(suggestion) => {
+                          handleInputChange('Description', 'UserDescription', suggestion);
+                        }}
+                      />
+                    </div>
         
                     <div className="space-y-2 pt-8 pb-16">
                       <div className="peer">
@@ -1674,6 +1802,82 @@ const GetInfo=() => {
           </div>
         </div>
       </div>
+
+      {/* AI Features */}
+      <ChatBot 
+        isOpen={isChatBotOpen} 
+        onToggle={() => setIsChatBotOpen(!isChatBotOpen)}
+        currentSection={steps[currentStep]?.title || 'general'}
+        userData={isExampleProcessing ? ExampleJsonData : formData}
+      />
+
+      {/* AI Analysis Modal */}
+      {showAIAnalysis && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 p-4 flex justify-between items-center">
+              <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">
+                AI Resume Analysis
+              </h2>
+              <button
+                onClick={() => setShowAIAnalysis(false)}
+                className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="p-6">
+              <AIAnalysis 
+                resumeData={isExampleProcessing ? ExampleJsonData : formData}
+                jobTitle={(isExampleProcessing ? ExampleJsonData : formData).contactInfo?.jobTitle}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AI Analysis Toggle Button */}
+      <button
+        onClick={() => setShowAIAnalysis(true)}
+        className="fixed bottom-6 left-6 bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 text-white p-4 rounded-full shadow-lg z-40 flex items-center space-x-2 transition-all duration-200"
+        title="Get AI Analysis"
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+        </svg>
+        <span className="hidden sm:inline text-sm font-medium">AI Analysis</span>
+      </button>
+
+      {/* AI Chatbot Component */}
+      <ChatBot 
+        isOpen={isChatBotOpen}
+        onToggle={() => setIsChatBotOpen(!isChatBotOpen)}
+        currentSection={currentStep === 0 ? 'contact' : 
+                       currentStep === 1 ? 'skills' :
+                       currentStep === 2 ? 'experience' :
+                       currentStep === 3 ? 'projects' :
+                       currentStep === 4 ? 'education' :
+                       currentStep === 5 ? 'certificates' :
+                       currentStep === 6 ? 'description' : 'general'}
+        userData={{
+          jobTitle: formData.contactInfo.jobTitle || 'Professional',
+          skills: formData.skills.hardSkills || '',
+          experience: formData.workExperience || [],
+          education: formData.education || [],
+          fullName: formData.contactInfo.fullName || '',
+          formData: formData
+        }}
+      />
+
+      {/* Download Modal */}
+      {showDownloadModal && (
+        <DownloadModal
+          isOpen={showDownloadModal}
+          onClose={() => setShowDownloadModal(false)}
+          resumeData={enhancedResumeData || getCurrentResumeData()}
+          selectedTemplate={getCurrentResumeData().selectedTemplate}
+        />
+      )}
     </div>
   );
 }

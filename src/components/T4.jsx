@@ -215,7 +215,7 @@ export const T4 = ({ jsonData, desc }) => {
     return skill.trim();
   };
 
-  const skills = jsonData.skills.hardSkills.split(',').map(skill => skill.trim()).filter(skill => skill !== '');
+  const skills = (jsonData?.skills?.hardSkills || '').split(',').map(skill => skill.trim()).filter(skill => skill !== '');
   const eachColumn = Math.floor(skills.length / 4);
   let column1 = eachColumn;
   let column2 = eachColumn;
@@ -248,8 +248,8 @@ export const T4 = ({ jsonData, desc }) => {
 
         <div className="right">
           <div className="head">
-            <h1>{jsonData.contactInfo.fullName}</h1>
-            <h2>{jsonData.contactInfo.jobTitle}</h2>
+            <h1>{jsonData?.contactInfo?.fullName || 'Your Name'}</h1>
+            <h2>{jsonData?.contactInfo?.jobTitle || 'Job Title'}</h2>
             <div className="Underline"></div>
           </div>
         </div>
@@ -259,12 +259,12 @@ export const T4 = ({ jsonData, desc }) => {
         <div className="left">
           <div className="Contact">
             <div className="Lsection-title"><b>Contact</b> <i className="fas fa-address-card"></i></div> <br />
-            <div className="Litem"><i className="fa fa-phone"></i> {jsonData.contactInfo.phoneNumber} </div>
+            <div className="Litem"><i className="fa fa-phone"></i> {jsonData?.contactInfo?.phoneNumber || 'Phone'} </div>
             <div className="Litem"><i className="fas fa-envelope"></i>
-              <a href={`mailto:${jsonData.contactInfo.emailAddress}`}> {jsonData.contactInfo.emailAddress.split('@')[0]} </a>
+              <a href={`mailto:${jsonData?.contactInfo?.emailAddress || ''}`}> {(jsonData?.contactInfo?.emailAddress || 'email@domain.com').split('@')[0]} </a>
             </div>
             <div className="Litem"><i className="fab fa-linkedin"></i>
-              <a href={`https://www.linkedin.com/in/${jsonData.contactInfo.linkedin}`} target="_blank" rel="noreferrer"> {jsonData.contactInfo.linkedin}</a>
+              <a href={`https://www.linkedin.com/in/${jsonData?.contactInfo?.linkedin || ''}`} target="_blank" rel="noreferrer"> {jsonData?.contactInfo?.linkedin || 'LinkedIn'}</a>
             </div>
             <div className="Litem"><i className="fas fa-globe"></i>
               <a href={isValidUrl(jsonData.contactInfo.portfolio) ? jsonData.contactInfo.portfolio : `https://github.com/${jsonData.contactInfo.portfolio}`} target="_blank" rel="noreferrer"> {jsonData.contactInfo.portfolio.replace(/^https?:\/\//, '')} </a>
@@ -299,7 +299,7 @@ export const T4 = ({ jsonData, desc }) => {
           <div className="Lsection">
             <div className="Lsection-title"><b>Languages </b><i className="fa fa-language"></i></div><br />
             <ul>
-              {jsonData.contactInfo.Languages.split(',').map(lang => lang.trim()).filter(lang => lang !== '').map((lang, index) => (
+              {(jsonData?.contactInfo?.Languages || '').split(',').map(lang => lang.trim()).filter(lang => lang !== '').map((lang, index) => (
                 <li key={index}>{removeSpace(lang)}: Fluent</li>
               ))}
             </ul>

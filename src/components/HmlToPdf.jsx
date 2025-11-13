@@ -34,7 +34,7 @@ const HtmlToPdfConverter = () => {
       const htmlContent = event.target.result;
 
       try {
-        const response = await fetch("Enter_your_backend_url", {
+        const response = await fetch("https://html2pdf-backend.onrender.com/generate-pdf", {
 
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -121,4 +121,3 @@ const HtmlToPdfConverter = () => {
 };
 
 export default HtmlToPdfConverter;
-
