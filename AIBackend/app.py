@@ -6,7 +6,6 @@ import json
 import re
 from dotenv import load_dotenv
 
-# Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
@@ -16,15 +15,13 @@ CORS(app, resources={r"/*": {"origins": [
     "https://nishanttech.host20.uk"
 ]}})
 
-# Configure Gemini AI
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
-    # Use the correct working model name
     model = genai.GenerativeModel('models/gemini-2.5-flash')
 
 def safe_ai_call(prompt, max_retries=3):
-    """Safely call AI with error handling and retries"""
+    # Safely call AI with error handling and retries
     for attempt in range(max_retries):
         try:
             if not GEMINI_API_KEY:
@@ -34,7 +31,6 @@ def safe_ai_call(prompt, max_retries=3):
             print(f"Attempt {attempt + 1}: Making AI call...")
             response = model.generate_content(prompt)
             
-            # Check if response has text
             if hasattr(response, 'text') and response.text:
                 print(f"SUCCESS: AI response received (length: {len(response.text)})")
                 return response.text
@@ -48,7 +44,6 @@ def safe_ai_call(prompt, max_retries=3):
             error_msg = str(e)
             print(f"AI call attempt {attempt + 1} failed: {error_msg}")
             
-            # Check for specific error types
             if "API_KEY_INVALID" in error_msg:
                 return "Invalid API key. Please check your Gemini API key."
             elif "QUOTA_EXCEEDED" in error_msg:
@@ -64,7 +59,7 @@ def enhance_content():
     """Enhance resume content using AI"""
     try:
         data = request.get_json()
-        content_type = data.get('type')  # 'description', 'skills', 'experience', etc.
+        content_type = data.get('type')
         content = data.get('content')
         job_title = data.get('jobTitle', '')
         context = data.get('context', {})
@@ -72,7 +67,6 @@ def enhance_content():
         if not content:
             return jsonify({'error': 'No content provided'}), 400
         
-        # Create specific prompts based on content type
         prompts = {
             'description': f"""
                 Enhance this professional summary for a {job_title} role. Make it more impactful, professional, and ATS-friendly:
@@ -171,7 +165,6 @@ def chatbot():
         if not user_message:
             return jsonify({'error': 'No message provided'}), 400
         
-        # Extract user context
         job_title = user_data.get('jobTitle', 'Professional')
         skills = user_data.get('skills', '')
         has_job_title = user_data.get('hasJobTitle', False)
@@ -180,7 +173,6 @@ def chatbot():
         completion_level = user_data.get('completionLevel', 0)
         current_section = user_data.get('currentSection', 'general')
         
-        # Create context-aware prompts for better responses
         context = f"""
         You are a professional resume writing assistant. The user is currently working on their resume.
         
@@ -210,7 +202,6 @@ def chatbot():
         Provide a direct, helpful response that uses their context where possible:
         """
         
-        # Handle common patterns with direct responses
         lower_message = user_message.lower()
         
         if any(word in lower_message for word in ['description', 'summary', 'about me', 'profile']):
@@ -292,10 +283,8 @@ def suggest_improvements():
         response = safe_ai_call(prompt)
         
         try:
-            # Try to parse as JSON, fallback to text if failed
             suggestions = json.loads(response)
         except:
-            # If JSON parsing fails, create structured response
             suggestions = {
                 "contentImprovements": [response],
                 "missingInformation": [],
@@ -343,7 +332,6 @@ def generate_keywords():
         try:
             keywords = json.loads(response)
         except:
-            # Fallback if JSON parsing fails
             keywords = {
                 "technical": response.split(',')[:10] if response else [],
                 "softSkills": [],
@@ -385,7 +373,6 @@ def complete_resume():
         if not resume_data:
             return jsonify({'error': 'No resume data provided'}), 400
         
-        # Extract current information
         contact_info = resume_data.get('contactInfo', {})
         job_title = contact_info.get('jobTitle', 'Professional')
         
@@ -437,7 +424,6 @@ def complete_resume():
         enhanced_content = safe_ai_call(prompt)
         
         try:
-            # Try to parse the AI response as JSON
             # Clean up any potential markdown formatting
             json_text = enhanced_content.strip()
             if json_text.startswith('```json'):
@@ -454,7 +440,6 @@ def complete_resume():
             })
             
         except json.JSONDecodeError:
-            # If JSON parsing fails, create enhanced version manually
             enhanced_resume = create_fallback_enhancement(resume_data, job_title)
             return jsonify({
                 'enhancedResume': enhanced_resume,
@@ -463,7 +448,6 @@ def complete_resume():
             })
         
     except Exception as e:
-        # Fallback to manual enhancement
         try:
             enhanced_resume = create_fallback_enhancement(resume_data, resume_data.get('contactInfo', {}).get('jobTitle', 'Professional'))
             return jsonify({
@@ -475,7 +459,7 @@ def complete_resume():
             return jsonify({'error': str(e)}), 500
 
 def create_fallback_enhancement(resume_data, job_title):
-    """Create enhanced resume when AI response can't be parsed"""
+    # Create enhanced resume when AI response can't be parsed
     enhanced = json.loads(json.dumps(resume_data))  # Deep copy
     
     # Enhance contact info

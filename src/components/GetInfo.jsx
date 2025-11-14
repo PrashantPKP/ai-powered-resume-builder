@@ -161,14 +161,19 @@ const GetInfo=() => {
   }, [i]);
 
   
-  const FIREBASE_URL = "https://resume-builder-6362c-default-rtdb.firebaseio.com/ResumesBuilt.json"; //Prashant
+  const FIREBASE_RESUMES_URL = import.meta.env.VITE_FIREBASE_RESUMES_URL;
 
 
   useEffect(() => {
-    fetch(FIREBASE_URL)
+    if (!FIREBASE_RESUMES_URL) {
+      console.warn('VITE_FIREBASE_RESUMES_URL is not configured. Skipping resume count fetch.');
+      return;
+    }
+
+    fetch(FIREBASE_RESUMES_URL)
       .then(res => res.json())
       .then(current => {
-        setResumesBuilt(current || 0);  // Show existing count
+        setResumesBuilt(current || 0);
       })
       .catch(error => {
         console.error("Error fetching resume count:", error);
@@ -191,19 +196,24 @@ const GetInfo=() => {
   }, [UserjsonData, location.state]);
 
   const updateResumeCount = () => {
-    fetch(FIREBASE_URL)
+    if (!FIREBASE_RESUMES_URL) {
+      console.warn('VITE_FIREBASE_RESUMES_URL is not configured. Skipping resume counter update.');
+      return;
+    }
+
+    fetch(FIREBASE_RESUMES_URL)
       .then(res => res.json())
       .then(current => {
         const updated = (current || 0) + 1;
-  
-        return fetch(FIREBASE_URL, {
+
+        return fetch(FIREBASE_RESUMES_URL, {
           method: "PUT",
           headers: {
             "Content-Type": "application/json"
           },
           body: JSON.stringify(updated),
         }).then(() => {
-          setResumesBuilt(updated);  // update UI
+          setResumesBuilt(updated);
         });
       })
       .catch(error => {
