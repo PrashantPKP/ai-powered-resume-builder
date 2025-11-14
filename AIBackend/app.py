@@ -401,20 +401,31 @@ def complete_resume():
         3. Experience descriptions: Maximum 3-4 bullet points per job, each under 100 characters
         4. Project descriptions: Maximum 2-3 short sentences per project
         5. Skills: Comma-separated keywords only, no explanations
-        6. Use BOLD keywords sparingly - only for most important terms
-        7. Prioritize SINGLE PAGE layout - do not add excessive content
-        8. Focus on IMPACT and KEYWORDS, not lengthy descriptions
+        6. Use BOLD (**text**) ONLY in experience and project descriptions for key achievements
+        7. DO NOT use bold in: skills, education, contact info, or profile summary
+        8. Prioritize SINGLE PAGE layout - do not add excessive content
+        9. Focus on IMPACT and KEYWORDS, not lengthy descriptions
         
         Enhancement Guidelines:
-        - Professional Summary: Compelling but BRIEF (2 lines max)
-        - Skills: Add relevant keywords but keep list manageable (15-20 skills max)
-        - Experience: Use action verbs + quantifiable results in SHORT bullet points
-        - Projects: Technical details in CONCISE format
-        - Education: Keep standard, no extra details
+        - Professional Summary: Compelling but BRIEF (2 lines max) - NO MARKDOWN
+        - Skills: Add relevant keywords but keep list manageable - NO MARKDOWN, plain comma-separated
+        - Experience: Add 1-2 line role summary below job title, then bullet points with bold achievements
+        - Projects: Technical details in CONCISE format - USE BOLD for technologies
+        - Education: Keep standard - NO MARKDOWN
+        - Contact Info: Keep as is - NO MARKDOWN
+        
+        WORK EXPERIENCE FORMAT (IMPORTANT):
+        For each work experience, write keyAchievements as ONE short paragraph (2-3 sentences).
+        Include role description and key achievements in a flowing paragraph with **bold** for important terms.
+        
+        Example format for keyAchievements:
+        "Contributed to full-stack web application development, focusing on robust backend and intuitive frontend solutions. **Developed** and **deployed** a full-stack web app using **React.js**, **Node.js**, and **MongoDB**. **Enhanced** user experience and **improved performance by 40%** through optimization."
+        
+        DO NOT use bullet points (•) - write as continuous paragraph text.
         
         FORMAT REQUIREMENTS:
-        - Use bullet points (•) for experience items
-        - Bold key terms like: **Python**, **Leadership**, **Project Management**
+        - Bold ONLY in experience/projects: **Python**, **increased sales by 30%**
+        - Skills should be plain text: Python, JavaScript, React (NO asterisks)
         - Keep descriptions under 100 characters each
         - Maintain same JSON structure
         
@@ -471,24 +482,32 @@ def create_fallback_enhancement(resume_data, job_title):
     if not enhanced.get('contactInfo', {}).get('jobTitle'):
         enhanced.setdefault('contactInfo', {})['jobTitle'] = job_title
     
-    # Enhance description - KEEP CONCISE
+    # Enhance description - NO MARKDOWN
     if not enhanced.get('Description', {}).get('UserDescription') or len(enhanced.get('Description', {}).get('UserDescription', '')) < 50:
-        enhanced.setdefault('Description', {})['UserDescription'] = f"**Experienced {job_title}** with proven expertise in delivering results. Strong problem-solving and collaboration skills."
+        enhanced.setdefault('Description', {})['UserDescription'] = f"Experienced {job_title} with proven expertise in delivering results. Strong problem-solving and collaboration skills."
     
-    # Enhance skills - CONCISE LISTS
+    # Enhance skills - NO MARKDOWN, CONCISE LISTS
     skills = enhanced.setdefault('skills', {})
     if not skills.get('hardSkills') or len(skills.get('hardSkills', '')) < 20:
         if 'developer' in job_title.lower() or 'engineer' in job_title.lower():
-            skills['hardSkills'] = "**JavaScript**, **Python**, **React**, **Node.js**, **Git**, **SQL**"
+            skills['hardSkills'] = "JavaScript, Python, React, Node.js, Git, SQL"
         elif 'designer' in job_title.lower():
-            skills['hardSkills'] = "**Figma**, **Adobe Creative Suite**, **UI/UX Design**, **Prototyping**"
+            skills['hardSkills'] = "Figma, Adobe Creative Suite, UI/UX Design, Prototyping"
         elif 'manager' in job_title.lower():
-            skills['hardSkills'] = "**Project Management**, **Agile**, **Leadership**, **Analytics**"
+            skills['hardSkills'] = "Project Management, Agile, Leadership, Analytics"
         else:
-            skills['hardSkills'] = "**Microsoft Office**, **Data Analysis**, **Communication**, **Problem Solving**"
+            skills['hardSkills'] = "Microsoft Office, Data Analysis, Communication, Problem Solving"
     
     if not skills.get('softSkills') or len(skills.get('softSkills', '')) < 20:
-        skills['softSkills'] = "**Leadership**, **Communication**, **Teamwork**, **Time Management**, **Adaptability**"
+        skills['softSkills'] = "Leadership, Communication, Teamwork, Time Management, Adaptability"
+    
+    # Enhance work experience with role descriptions
+    if enhanced.get('workExperience') and isinstance(enhanced['workExperience'], list):
+        for exp in enhanced['workExperience']:
+            if exp.get('keyAchievements') and len(exp['keyAchievements']) < 100:
+                role = exp.get('jobTitle', 'Professional')
+                # Add as single paragraph with bold terms
+                exp['keyAchievements'] = f"Responsible for driving results and contributing to organizational success. **Delivered** high-quality work exceeding expectations and **collaborated** with cross-functional teams to **improve** processes and efficiency."
     
     # Ensure projects exist
     if not enhanced.get('projects') or not enhanced['projects'][0].get('projectTitle'):
