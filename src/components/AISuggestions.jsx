@@ -7,9 +7,12 @@ const AISuggestions = ({ jobTitle = '', userData = {}, onApplySuggestion }) => {
   const [suggestions, setSuggestions] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [error, setError] = useState(null);
 
   const generateSuggestions = async () => {
     setIsLoading(true);
+    setError(null);
+    
     try {
       const response = await fetch('http://localhost:5001/generate-profile-suggestions', {
         method: 'POST',
@@ -17,34 +20,41 @@ const AISuggestions = ({ jobTitle = '', userData = {}, onApplySuggestion }) => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          jobTitle: jobTitle,
+          jobTitle: jobTitle || 'Professional',
           userData: userData,
           suggestionType: 'profile_description'
-        })
+        }),
+        signal: AbortSignal.timeout(15000) // 15 second timeout
       });
 
       if (response.ok) {
         const data = await response.json();
-        setSuggestions(data.suggestions || []);
-        setShowSuggestions(true);
-        toast.success('AI suggestions generated!');
+        if (data.suggestions && Array.isArray(data.suggestions) && data.suggestions.length > 0) {
+          setSuggestions(data.suggestions);
+          setShowSuggestions(true);
+          toast.success('AI suggestions generated!');
+        } else {
+          throw new Error('No suggestions received');
+        }
       } else {
         throw new Error('Failed to generate suggestions');
       }
     } catch (error) {
       console.error('AI suggestions error:', error);
       
-      // Fallback suggestions based on job title
+      // Always use fallback suggestions on error
       const fallbackSuggestions = generateFallbackSuggestions();
       setSuggestions(fallbackSuggestions);
       setShowSuggestions(true);
       toast.success('Suggestions ready!');
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const generateFallbackSuggestions = () => {
-    const baseTitle = jobTitle || 'Professional';
+    const baseTitle = (jobTitle && jobTitle.trim() !== '') ? jobTitle : 'Professional';
+    
     return [
       `Results-driven ${baseTitle} with proven expertise in delivering high-quality solutions. Passionate about leveraging cutting-edge technologies to drive innovation and exceed performance targets.`,
       
@@ -64,8 +74,15 @@ const AISuggestions = ({ jobTitle = '', userData = {}, onApplySuggestion }) => {
   };
 
   const applySuggestion = (suggestion) => {
-    onApplySuggestion(suggestion);
-    toast.success('Suggestion applied!');
+    if (onApplySuggestion && typeof onApplySuggestion === 'function') {
+      try {
+        onApplySuggestion(suggestion);
+        toast.success('Suggestion applied!');
+      } catch (error) {
+        console.error('Error applying suggestion:', error);
+        toast.error('Failed to apply suggestion');
+      }
+    }
   };
 
   return (
@@ -101,6 +118,12 @@ const AISuggestions = ({ jobTitle = '', userData = {}, onApplySuggestion }) => {
       <p className="text-xs text-gray-600 dark:text-gray-400 mb-3">
         Get AI-powered professional summary suggestions tailored for {jobTitle || 'your role'}
       </p>
+
+      {error && (
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-3 rounded-lg mb-3">
+          <p className="text-xs text-red-600 dark:text-red-400">{error}</p>
+        </div>
+      )}
 
       <AnimatePresence>
         {showSuggestions && suggestions.length > 0 && (

@@ -3,6 +3,15 @@
 import React from 'react';
 import styled from "styled-components";
 
+// Helper function to convert markdown to HTML
+const parseMarkdown = (text) => {
+  if (!text || typeof text !== 'string') return '';
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>') // Bold
+    .replace(/\*(.+?)\*/g, '<em>$1</em>') // Italic
+    .replace(/\n/g, ' '); // Convert line breaks to spaces for continuous text
+};
+
 const removespace = (str) => str.trim();
 
 const StyledWrapper = styled.div`
@@ -301,7 +310,7 @@ export const T1 = ({ jsonData }) => {
     <div className="Ritem project-item" key={`proj-${index}`}>
       <li>
         <div className="item-title TextLight">{proj.projectTitle}</div>
-        <div>{proj.toolsTechUsed}</div>
+        <div dangerouslySetInnerHTML={{ __html: parseMarkdown(proj.toolsTechUsed) }} />
       </li>
     </div>
   ));
@@ -313,14 +322,16 @@ export const T1 = ({ jsonData }) => {
         <div>{we.WorkDuration}</div>
       </div>
       ({we.jobTitle}) <br/>
-      {we.keyAchievements} <br />{index < column4 - 1 && <br />}
+      <span dangerouslySetInnerHTML={{ __html: parseMarkdown(we.keyAchievements) }} /> <br />{index < column4 - 1 && <br />}
     </li>
   ));
 
-  const certificateNames = jsonData.certificates.map(cer => cer.certificateName);
-  const certificateProviders = jsonData.certificates.map(cer => cer.providerName);
-  const certificateDuration = jsonData.certificates.map(cer => cer.courseDuration);
-  const certificatePlaceholders = Array(jsonData.certificates.length).fill('--');
+  const certificatesList = jsonData.certificates.map((cert, index) => (
+    <div key={`cert-${index}`} className="Ritem" style={{ marginBottom: '10px' }}>
+      <div className="item-title TextLight">{cert.certificateName}</div>
+      <div>{cert.providerName} - ({cert.courseDuration})</div>
+    </div>
+  ));
 
   return (
     <StyledWrapper>
@@ -387,6 +398,7 @@ export const T1 = ({ jsonData }) => {
             </ul>
           </div>
           
+          {jsonData.workExperience && jsonData.workExperience.length > 0 && jsonData.workExperience[0].companyName && (
           <div className="section">
             <div className="section-title"><b>Work Experience</b></div>
             <div className="Ritem">
@@ -395,41 +407,16 @@ export const T1 = ({ jsonData }) => {
               </ul>
             </div>
           </div>
+          )}
 
+          {jsonData.certificates && jsonData.certificates.length > 0 && jsonData.certificates[0].certificateName && (
           <div className="section">
             <div className="section-title"><b>Certificates</b></div>
-            <div className="Ritem subcont NoneDecoration">
-              <div>
-                {certificateNames.map((cert, index) => (
-                  <React.Fragment key={`cert-${index}`}>
-                    {cert}<br/>
-                  </React.Fragment>
-                ))}
-                <a href="#" target="_blank" rel="noreferrer">More Certificates</a>
-              </div>
-              <div>
-                {certificatePlaceholders.map((placeholder, index) => (
-                  <React.Fragment key={`placeholder-${index}`}>
-                    {placeholder}<br/>
-                  </React.Fragment>
-                ))}
-              </div>
-              <div>
-                {certificateProviders.map((provider, index) => (
-                  <React.Fragment key={`provider-${index}`}>
-                    {provider}<br/>
-                  </React.Fragment>
-                ))}
-              </div>
-              <div className='fontLight'>
-                {certificateDuration.map((Duration, index) => (
-                  <React.Fragment key={`provider-${index}`}>
-                    ({Duration})<br/>
-                  </React.Fragment>
-                ))}
-              </div>
+            <div className="Ritem">
+              {certificatesList}
             </div>
           </div>
+          )}
 
           <div className="skills">
             <div className="section-title"><b>Technical Skills</b></div>

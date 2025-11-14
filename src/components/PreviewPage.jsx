@@ -41,7 +41,8 @@ const PreviewPage = () => {
 
       if (response.ok) {
         const data = await response.json();
-        setAiEnhancedData(data.enhancedResume);
+        const cleanedData = cleanupMarkdownInNonTargetSections(data.enhancedResume);
+        setAiEnhancedData(cleanedData);
         setSelectedVersion('enhanced');
         toast.success('Resume enhanced with AI!');
       } else {
@@ -60,6 +61,49 @@ const PreviewPage = () => {
     setIsEnhancing(false);
   };
 
+  const cleanupMarkdownInNonTargetSections = (data) => {
+    // Remove markdown (**text**) from sections where we don't parse it
+    const cleaned = JSON.parse(JSON.stringify(data));
+    
+    // Clean description/profile summary - no markdown
+    if (cleaned.Description?.UserDescription) {
+      cleaned.Description.UserDescription = cleaned.Description.UserDescription.replace(/\*\*/g, '');
+    }
+    
+    // Clean skills - no markdown
+    if (cleaned.skills?.hardSkills) {
+      cleaned.skills.hardSkills = cleaned.skills.hardSkills.replace(/\*\*/g, '');
+    }
+    if (cleaned.skills?.softSkills) {
+      cleaned.skills.softSkills = cleaned.skills.softSkills.replace(/\*\*/g, '');
+    }
+    
+    // Clean contact info - no markdown
+    if (cleaned.contactInfo) {
+      Object.keys(cleaned.contactInfo).forEach(key => {
+        if (typeof cleaned.contactInfo[key] === 'string') {
+          cleaned.contactInfo[key] = cleaned.contactInfo[key].replace(/\*\*/g, '');
+        }
+      });
+    }
+    
+    // Clean education - no markdown
+    if (cleaned.education && Array.isArray(cleaned.education)) {
+      cleaned.education.forEach(edu => {
+        Object.keys(edu).forEach(key => {
+          if (typeof edu[key] === 'string') {
+            edu[key] = edu[key].replace(/\*\*/g, '');
+          }
+        });
+      });
+    }
+    
+    // Keep markdown in: projects (toolsTechUsed), workExperience (keyAchievements)
+    // These sections will parse the markdown to bold text
+    
+    return cleaned;
+  };
+
   const createFallbackEnhancement = (data) => {
     const enhanced = JSON.parse(JSON.stringify(data));
 
@@ -68,7 +112,7 @@ const PreviewPage = () => {
       enhanced.contactInfo.jobTitle = enhanced.contactInfo.jobTitle || 'Professional';
     }
 
-    // Enhance skills
+    // Enhance skills - NO MARKDOWN FORMATTING
     if (!enhanced.skills.hardSkills || enhanced.skills.hardSkills.length < 20) {
       const jobTitle = enhanced.contactInfo.jobTitle.toLowerCase();
       const additionalSkills = getSkillSuggestions(jobTitle);
@@ -83,10 +127,36 @@ const PreviewPage = () => {
         : 'Communication, Problem Solving, Leadership, Teamwork, Time Management, Adaptability';
     }
 
-    // Enhance description - KEEP CONCISE
+    // Clean up any markdown from skills
+    if (enhanced.skills.hardSkills) {
+      enhanced.skills.hardSkills = enhanced.skills.hardSkills.replace(/\*\*/g, '');
+    }
+    if (enhanced.skills.softSkills) {
+      enhanced.skills.softSkills = enhanced.skills.softSkills.replace(/\*\*/g, '');
+    }
+
+    // Enhance description - NO MARKDOWN
     if (!enhanced.Description?.UserDescription || enhanced.Description.UserDescription.length < 50) {
       enhanced.Description = enhanced.Description || {};
-      enhanced.Description.UserDescription = `**Experienced ${enhanced.contactInfo.jobTitle}** with proven track record in delivering high-quality results. Strong expertise in problem-solving and team collaboration.`;
+      enhanced.Description.UserDescription = `Experienced ${enhanced.contactInfo.jobTitle} with proven track record in delivering high-quality results. Strong expertise in problem-solving and team collaboration.`;
+    }
+
+    // Clean up any markdown from description
+    if (enhanced.Description?.UserDescription) {
+      enhanced.Description.UserDescription = enhanced.Description.UserDescription.replace(/\*\*/g, '');
+    }
+
+    // Enhance work experience with role descriptions
+    if (enhanced.workExperience && Array.isArray(enhanced.workExperience)) {
+      enhanced.workExperience = enhanced.workExperience.map(exp => {
+        if (!exp.keyAchievements || exp.keyAchievements.length < 100) {
+          return {
+            ...exp,
+            keyAchievements: `Responsible for delivering high-quality results and contributing to team success. **Implemented** solutions that improved efficiency and **collaborated** with cross-functional teams to **achieve** measurable results and exceed goals.`
+          };
+        }
+        return exp;
+      });
     }
 
     return enhanced;
@@ -157,7 +227,14 @@ const PreviewPage = () => {
   };
 
   const handleBackToEdit = () => {
-    navigate(-1); // Go back to the previous page (GetInfo)
+    // Navigate back to edit page with current resume data
+    const dataToPass = selectedVersion === 'enhanced' && aiEnhancedData ? aiEnhancedData : resumeData;
+    navigate('/GetInfo', { 
+      state: { 
+        jsonData: dataToPass,
+        fromPreview: true
+      } 
+    });
   };
 
   return (
@@ -178,13 +255,13 @@ const PreviewPage = () => {
           }
           
           .resume {
-            max-height: 1400px;
-            overflow-y: auto;
+            max-height: none;
+            overflow: visible;
           }
           
           .preview-container {
-            max-height: 80vh;
-            overflow-y: auto;
+            max-height: 85vh;
+            overflow: auto;
             scrollbar-width: thin;
             scrollbar-color: #4a5568 #1a202c;
           }
@@ -200,6 +277,38 @@ const PreviewPage = () => {
           .preview-container::-webkit-scrollbar-thumb {
             background: #4a5568;
             border-radius: 3px;
+          }
+          
+          /* Force readable text colors in preview */
+          .resume-preview-content * {
+            color: inherit !important;
+          }
+          
+          .resume-preview-content {
+            color: #000000 !important;
+          }
+          
+          .resume-preview-content h1,
+          .resume-preview-content h2,
+          .resume-preview-content h3,
+          .resume-preview-content h4,
+          .resume-preview-content h5,
+          .resume-preview-content h6 {
+            color: #1a1a1a !important;
+          }
+          
+          .resume-preview-content p,
+          .resume-preview-content div,
+          .resume-preview-content span,
+          .resume-preview-content li {
+            color: #2d2d2d !important;
+          }
+          
+          /* Keep specific styled elements */
+          .resume-preview-content .TextLight,
+          .resume-preview-content [class*="text-"],
+          .resume-preview-content [class*="color"] {
+            opacity: 1 !important;
           }
         `
       }} />
@@ -308,8 +417,8 @@ const PreviewPage = () => {
 
           {/* Resume Display */}
           <div className="flex justify-center">
-            <div className="bg-white rounded-lg shadow-2xl overflow-hidden max-w-4xl w-full preview-container">
-              <div className="p-8 transform scale-100">
+            <div className="bg-white rounded-lg shadow-2xl overflow-auto max-w-[950px] w-full preview-container">
+              <div className="p-8 resume-preview-content">
                 {renderTemplate()}
               </div>
             </div>

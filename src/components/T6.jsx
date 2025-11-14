@@ -2,6 +2,15 @@
 import styled from "styled-components";
 import React from 'react';
 
+// Helper function to convert markdown to HTML
+const parseMarkdown = (text) => {
+  if (!text || typeof text !== 'string') return '';
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>') // Bold
+    .replace(/\*(.+?)\*/g, '<em>$1</em>') // Italic
+    .replace(/\n/g, ' '); // Convert line breaks to spaces for continuous text
+};
+
 const StyledWrapper=styled.div`body {
   font-family: Arial, sans-serif;
   margin: 0;
@@ -132,7 +141,7 @@ export const T6 = ({ jsonData }) => {
 
       <div className="Conts">
         <div className="title">Objectives:</div>
-        {jsonData.Description.UserDescription}
+              <Description dangerouslySetInnerHTML={{ __html: parseMarkdown(jsonData.Description.UserDescription) }} />
       </div>
 
       <div className="Conts">
@@ -161,13 +170,14 @@ export const T6 = ({ jsonData }) => {
             <div key={index} className="Ritem">
               <li>
                 <div className="item-title">{proj.projectTitle}</div>
-                <div>{proj.toolsTechUsed}</div>
+                <div dangerouslySetInnerHTML={{ __html: parseMarkdown(proj.toolsTechUsed) }} />
               </li>
             </div>
           ))}
         </ul>
       </div>
 
+      {jsonData.workExperience && jsonData.workExperience.length > 0 && jsonData.workExperience[0].companyName && (
       <div className="Conts">
         <div className="title">Work Experience:</div>
         {jsonData.workExperience.map((exp, index) => (
@@ -179,54 +189,31 @@ export const T6 = ({ jsonData }) => {
                   <div className="Right">{exp.WorkDuration}</div>
                 </div>
               </li>
-              <span style={{marginLeft:'20px'}}>{exp.keyAchievements}</span>
+              <span style={{marginLeft:'20px'}} dangerouslySetInnerHTML={{ __html: parseMarkdown(exp.keyAchievements) }} />
             </ul>
             
           </div>
         ))}
       </div>
+      )}
 
+      {jsonData.certificates && jsonData.certificates.length > 0 && jsonData.certificates[0].certificateName && (
       <div className="Conts">
         <div className="title">Certifications:</div>
-        <div className="flexConts subcont">
-          <div className="mar-30">
-            {jsonData.certificates.map((cert, index) => (
-              <React.Fragment key={index}>
-                {index > 0 && <br />}
+        <div>
+          {jsonData.certificates.map((cert, index) => (
+            <div key={index} style={{ marginBottom: '12px' }}>
+              <div style={{ fontWeight: 'bold', color: '#1a1a1a' }}>
                 {cert.certificateName}
-              </React.Fragment>
-            ))}
-          </div>
-          <div className="mar-30">
-            {jsonData.certificates.map((_, index) => (
-              <React.Fragment key={index}>
-                {index > 0 && <br />}
-                --
-              </React.Fragment>
-            ))}
-            <br />
-          </div>
-          <div className="mar-30">
-            {jsonData.certificates.map((cert, index) => (
-              <React.Fragment key={index}>
-                {index > 0 && <br />}
-                {cert.providerName}
-              </React.Fragment>
-            ))}
-            <br />
-          </div>
-          <div className="mar-30 TextLight">
-            {jsonData.certificates.map((cert, index) => (
-              <React.Fragment key={index}>
-                {index > 0 && <br />}
-                ({cert.courseDuration})
-              </React.Fragment>
-            ))}
-            <br />
-          </div>
+              </div>
+              <div style={{ color: '#4a4a4a', fontSize: '0.9em' }}>
+                {cert.providerName} - ({cert.courseDuration})
+              </div>
+            </div>
+          ))}
         </div>
-        <a className="NoneDecoration mll-3" href="#" target="_blank" rel="noreferrer">More Certificates</a>
       </div>
+      )}
 
       <div className="Conts">
         <div className="title">Declaration:</div>

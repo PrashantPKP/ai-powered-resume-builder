@@ -3,6 +3,15 @@
 import React from 'react';
 import styled from "styled-components";
 
+// Helper function to convert markdown to HTML
+const parseMarkdown = (text) => {
+  if (!text || typeof text !== 'string') return '';
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>') // Bold
+    .replace(/\*(.+?)\*/g, '<em>$1</em>') // Italic
+    .replace(/\n/g, ' '); // Convert line breaks to spaces for continuous text
+};
+
 const StyledWrapper = styled.div`
 body {
   font-family: Arial, sans-serif;
@@ -229,9 +238,7 @@ export const T3 = ({jsonData}) => {
           <div className="right">
             <div className="section">
               <div className="section-title"><b>Profile Summary</b></div>
-              <p>
-                {jsonData.Description.UserDescription}
-              </p>
+              <p>{jsonData.Description.UserDescription}</p>
             </div>
 
             <div className="SUsection">
@@ -241,13 +248,14 @@ export const T3 = ({jsonData}) => {
                   <div className="Ritem" key={index}>
                     <li>
                       <div className="item-title TextLight">{proj.projectTitle} </div>
-                      <div> {proj.toolsTechUsed} </div>
+                      <div dangerouslySetInnerHTML={{ __html: parseMarkdown(proj.toolsTechUsed) }} />
                     </li>
                   </div>
                 ))}
               </ul>
             </div>
 
+            {jsonData.workExperience && jsonData.workExperience.length > 0 && jsonData.workExperience[0].companyName && (
             <div className="section">
               <div className="section-title"><b>Work Experience</b></div>
               <div className="Ritem">
@@ -256,55 +264,32 @@ export const T3 = ({jsonData}) => {
                     <li key={index} className='mbb-2'>
                       <div className="item-title TextLight">{we.companyName}<div>{we.WorkDuration}</div> </div>
                       {we.jobTitle}<br />
-                      {we.keyAchievements}
+                      <span dangerouslySetInnerHTML={{ __html: parseMarkdown(we.keyAchievements) }} />
                       {index < jsonData.workExperience.length - 1 && <br />}
                     </li>
                   ))}
                 </ul>
               </div>
             </div>
+            )}
 
+            {jsonData.certificates && jsonData.certificates.length > 0 && jsonData.certificates[0].certificateName && (
             <div className="section">
               <div className="section-title"><b>Certificates</b></div>
-              <div className="Ritem subcont NoDecorationBlue">
-                <div>
-                  {jsonData.certificates.map((cer, index) => (
-                    <React.Fragment key={index}>
-                      {cer.certificateName}
-                      {index < jsonData.certificates.length - 1 && <br />}
-                    </React.Fragment>
-                  ))}
-                  <br /><a href="#" target="_blank" rel="noreferrer">More Certificates</a>
-                </div>
-                <div>
-                  {jsonData.certificates.map((_, index) => (
-                    <React.Fragment key={index}>
-                      --
-                      {index < jsonData.certificates.length - 1 && <br />}
-                    </React.Fragment>
-                  ))}
-                  <br />
-                </div>
-                <div>
-                  {jsonData.certificates.map((cer, index) => (
-                    <React.Fragment key={index}>
-                      {cer.providerName}
-                      {index < jsonData.certificates.length - 1 && <br />}
-                    </React.Fragment>
-                  ))}
-                  <br />
-                </div>
-                <div className='TextLight'>
-                  {jsonData.certificates.map((cer, index) => (
-                    <React.Fragment key={index}>
-                      ({cer.courseDuration})
-                      {index < jsonData.certificates.length - 1 && <br />}
-                    </React.Fragment>
-                  ))}
-                  <br />
-                </div>
+              <div className="Ritem">
+                {jsonData.certificates.map((cert, index) => (
+                  <div key={index} style={{ marginBottom: '12px' }}>
+                    <div style={{ fontWeight: 'bold', color: '#1a1a1a' }}>
+                      {cert.certificateName}
+                    </div>
+                    <div style={{ color: '#4a4a4a', fontSize: '0.9em' }}>
+                      {cert.providerName} - ({cert.courseDuration})
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
+            )}
 
             <div className="skills">
               <div className="section-title"><b>Technical Skills</b></div>

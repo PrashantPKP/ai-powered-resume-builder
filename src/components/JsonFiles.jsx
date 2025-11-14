@@ -2,7 +2,7 @@
 
 const JsonFiles=[
       {
-       selectedTemplate: "1",
+       selectedTemplate: "5",
        contactInfo: {
          fullName: "Prashant Parshuramkar",
          phoneNumber: "9623447749",
@@ -55,7 +55,7 @@ const JsonFiles=[
            institutionName: "Martandrao Patil Kapgate Jr. College Jambhali Sadak",
            degreeName: "HSC",
            graduationYear: "2020 - 2021",
-           currentCGPA: "8.43"
+           currentCGPA: "84.3"
          }
        ],
        certificates: [
@@ -63,11 +63,6 @@ const JsonFiles=[
            certificateName: "Azure Fundamentals",
            courseDuration: "3 Month",
            providerName: "Microsoft"
-         },
-         {
-           certificateName: "SQL",
-           courseDuration: "1 Month",
-           providerName: "HackerRank"
          },
          {
            certificateName: "Web Development Course",
@@ -79,19 +74,15 @@ const JsonFiles=[
            courseDuration: "3 Month",
            providerName: "Coursera"
          },
-         {
-           certificateName: "Full Stack Developer Internship",
-           courseDuration: "6 Month",
-           providerName: "Refine Media Pvt. Ltd."
-         },
+         
        ],
        Description:{
-         UserDescription: "Passionate MERN Stack Developer with hands-on experience in building scalable, responsive, and high-performance web applications. Proficient in MongoDB, Express.js, React.js, and Node.js, with a strong focus on clean code, RESTful APIs, and user-centric interfaces. Skilled in end-to-end development, third-party integrations, and agile collaboration to deliver modern, production-ready solutions."
+         UserDescription: "MERN Stack Developer skilled in building fast, scalable, and responsive web apps. Proficient in MongoDB, Express.js, React, and Node.js with a focus on clean code, REST APIs, and user-friendly interfaces. Experienced in end-to-end development and delivering modern, production-ready solutions."
        }
       },
 
       {
-         selectedTemplate: "2",
+         selectedTemplate: "3",
          contactInfo: {
          fullName: "Nishant Sonar",
          phoneNumber: "9970135444",
@@ -162,23 +153,13 @@ const JsonFiles=[
            providerName: "HackerRank"
          },
          {
-           certificateName: "Web Development Course",
-           courseDuration: "12 Month",
-           providerName: "STP Computer Education"
-         },
-         {
-           certificateName: "AI and ML Fundamentals",
-           courseDuration: "3 Month",
-           providerName: "KasNet Technologies"
-         },
-         {
            certificateName: "PugArch Full Stack Developer Internship",
            courseDuration: "6 Month",
            providerName: "PugArch Technologies"
          },
        ],
        Description:{
-         UserDescription: "Versatile Full Stack Developer with hands-on experience in developing scalable web applications using modern frontend and backend technologies. Proficient in JavaScript, React, Node.js, and SQL databases. Skilled in RESTful API integration, cloud deployment Azure, and version control (Git). Passionate about building user-centric solutions with clean, maintainable code."
+         UserDescription: "Full Stack Developer experienced in building scalable web apps using JavaScript, React, Node.js, and SQL. Skilled in REST APIs, Azure deployment, and Git. Focused on delivering clean, user-centric, and maintainable solutions."
        }
       }
 

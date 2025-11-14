@@ -93,6 +93,25 @@ const FileUploadPage = () => {
         >
         </Switch>
     </div> */}
+
+   {/* Fill Form */}
+    <div className="w-[90%] lg:w-4/5 mx-4 bg-gray-200 dark:bg-slate-800 rounded-xl shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between px-6 py-4 space-y-4 sm:space-y-0 hover:shadow-lg transition-shadow duration-300">
+      <div className="w-full sm:w-auto lg:ml-14">
+        <p className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+          Start by filling your details...
+        </p>
+        <p className="text-md mt-1 font-semibold text-gray-500 dark:text-gray-400">
+          it mostly take 8 to 10 minutes
+        </p>
+      </div>
+      <button
+        className="w-full sm:w-auto px-5 py-2 lg:mr-14 bg-blue-600 text-white rounded-xl hover:bg-blue-700"
+        onClick={() => navigate("/GetInfo")}
+      >
+        Continue &gt;
+      </button>
+    </div>
+
   
     {/* JSON Upload Container */}
     <div className="w-[90%] lg:w-4/5 mx-4 bg-gray-200 dark:bg-slate-800 rounded-xl shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between px-6 py-4 space-y-4 sm:space-y-0 hover:shadow-lg transition-shadow duration-300">
@@ -124,23 +143,7 @@ const FileUploadPage = () => {
       )}
     </div>
   
-    {/* Fill Form */}
-    <div className="w-[90%] lg:w-4/5 mx-4 bg-gray-200 dark:bg-slate-800 rounded-xl shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between px-6 py-4 space-y-4 sm:space-y-0 hover:shadow-lg transition-shadow duration-300">
-      <div className="w-full sm:w-auto lg:ml-14">
-        <p className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-          Start by filling your details...
-        </p>
-        <p className="text-md mt-1 font-semibold text-gray-500 dark:text-gray-400">
-          it mostly take 8 to 10 minutes
-        </p>
-      </div>
-      <button
-        className="w-full sm:w-auto px-5 py-2 lg:mr-14 bg-blue-600 text-white rounded-xl hover:bg-blue-700"
-        onClick={() => navigate("/GetInfo")}
-      >
-        Continue &gt;
-      </button>
-    </div>
+ 
   
     {/* PDF/DOCX Upload Container */}
     <div className="w-[90%] lg:w-4/5 mx-4 bg-gray-200 dark:bg-slate-800 rounded-xl shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between px-6 py-4 space-y-4 sm:space-y-0 hover:shadow-lg transition-shadow duration-300">

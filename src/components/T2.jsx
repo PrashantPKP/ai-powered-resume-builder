@@ -3,6 +3,15 @@
 import React from 'react';
 import styled from 'styled-components';
 
+// Helper function to convert markdown to HTML
+const parseMarkdown = (text) => {
+  if (!text || typeof text !== 'string') return '';
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>') // Bold
+    .replace(/\*(.+?)\*/g, '<em>$1</em>') // Italic
+    .replace(/\n/g, ' '); // Convert line breaks to spaces for continuous text
+};
+
 const StyledWrapper = styled.div`
 @media print {
   body {
@@ -262,18 +271,22 @@ export const T2 = ({ jsonData }) => {
         <br />
       </div>
 
+      {jsonData?.workExperience && jsonData.workExperience.length > 0 && jsonData.workExperience[0]?.companyName && (
+      <>
       <h3 className="Heading">Work Experience</h3>
       <div className="experience">
         {(jsonData?.workExperience || []).map((exp, index) => (
           <div className="experience-item" key={index}>
             <ul>
               <li className="SpaceBetween">🔸{exp?.companyName || 'Company'} | {exp?.jobTitle || 'Position'} <span>( {exp?.WorkDuration || 'Duration'} )</span></li>
-              <p style={{ marginLeft: '22px' }}>{exp?.keyAchievements || 'Key achievements and responsibilities'}</p>
+              <p style={{ marginLeft: '22px' }} dangerouslySetInnerHTML={{ __html: parseMarkdown(exp?.keyAchievements || 'Key achievements and responsibilities') }} />
             </ul>
           </div>
         ))}
         <br />
       </div>
+      </>
+      )}
     
       <h3 className="Heading">Projects</h3>
       <div className="education">
@@ -281,52 +294,30 @@ export const T2 = ({ jsonData }) => {
           <div className="Projects-items" key={index}>
             <ul>
               <li><h4 className="fontlight">{proj?.projectTitle || 'Project Title'}</h4></li>
-              <p>{proj?.toolsTechUsed || 'Technologies used'}</p>
+              <p dangerouslySetInnerHTML={{ __html: parseMarkdown(proj?.toolsTechUsed || 'Technologies used') }} />
             </ul>  
           </div>
         ))}
         <br />
       </div>
 
+      {jsonData?.certificates && jsonData.certificates.length > 0 && jsonData.certificates[0]?.certificateName && (
+      <>
       <h3 className="Heading">Certifications</h3>
-      <div className="justflex Certificats">
-        <div className='mar-30'>
-          {(jsonData?.certificates || []).map((cer, index) => (
-            <React.Fragment key={index}>
+      <div className="Certificats">
+        {(jsonData?.certificates || []).map((cer, index) => (
+          <div key={index} style={{ marginBottom: '15px' }}>
+            <div style={{ fontWeight: 'bold', color: '#1a1a1a' }}>
               {cer?.certificateName || 'Certificate'}
-              {index < (jsonData?.certificates || []).length - 1 && <br />}
-            </React.Fragment>
-          ))}
-          <br /><a href="#" className="NoneDecoration" target="_blank" rel="noreferrer">More Certificates</a><br /><br />
-        </div>
-        <div className='mar-30'>
-          {(jsonData?.certificates || []).map((_, index) => (
-            <React.Fragment key={index}>
-              --
-              {index < (jsonData?.certificates || []).length - 1 && <br />}
-            </React.Fragment>
-          ))}
-          <br /><br /> <br />
-        </div>
-        <div className='mar-30'>
-          {(jsonData?.certificates || []).map((cer, index) => (
-            <React.Fragment key={index}>
-              {cer?.providerName || 'Provider'}
-              {index < (jsonData?.certificates || []).length - 1 && <br />}
-            </React.Fragment>
-          ))}
-          <br /><br /><br />
-        </div>
-        <div className='mar-30'>
-          {(jsonData?.certificates || []).map((cer, index) => (
-            <React.Fragment key={index}>
-              <span>{`(${cer?.courseDuration || 'Duration'})`}</span>
-              {index < (jsonData?.certificates || []).length - 1 && <br />}
-            </React.Fragment>
-          ))}
-          <br /><br /><br />
-        </div>
+            </div>
+            <div style={{ color: '#4a4a4a', fontSize: '0.9em' }}>
+              {cer?.providerName || 'Provider'} - ({cer?.courseDuration || 'Duration'})
+            </div>
+          </div>
+        ))}
       </div>
+      </>
+      )}
 
       <h3 className="Heading">Technical Skills</h3>
       <div className="skills SpaceBetween">

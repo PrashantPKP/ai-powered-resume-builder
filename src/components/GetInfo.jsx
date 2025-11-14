@@ -1,5 +1,5 @@
 
-import React, { useState,useEffect } from 'react';
+import React, { useState,useEffect, useRef } from 'react';
 import { Check, Plus, ChevronRight, Menu, X ,Eye, FileText, Trash2, Minus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Typed from "typed.js"; 
@@ -17,7 +17,6 @@ import ChatBot from './ChatBot.jsx';
 import AIAnalysis from './AIAnalysis.jsx';
 import AISuggestions from './AISuggestions.jsx';
 import DatePicker from './DatePicker.jsx';
-import OptionalSection from './OptionalSection.jsx';
 import DownloadModal from './DownloadModal.jsx';
 
 const GetInfo=() => {
@@ -30,6 +29,7 @@ const GetInfo=() => {
   const [NextError, setNextError]=useState(false);
   const navigate=useNavigate();
   const [ExampleJsonData, setExampleJsonData]=useState(UserjsonData?UserjsonData:JsonFiles[Math.floor(Math.random() * JsonFiles.length)]);
+  const hasLoadedDataRef = useRef(false);
   
   // AI-related state
   const [isChatBotOpen, setIsChatBotOpen] = useState(false);
@@ -175,6 +175,21 @@ const GetInfo=() => {
       });
   }, []);
 
+  // Load data when coming back from Result or Preview page
+  useEffect(() => {
+    if (UserjsonData && !hasLoadedDataRef.current) {
+      hasLoadedDataRef.current = true;
+      setFormData(UserjsonData);
+      setIsExampleProcessing(false);
+      
+      // Set all steps as completed and go to last step
+      if (UserjsonData.selectedTemplate) {
+        setCurrentStep(7); // Last step - Description
+        setCompletedSteps(new Set([0, 1, 2, 3, 4, 5, 6, 7]));
+      }
+    }
+  }, [UserjsonData, location.state]);
+
   const updateResumeCount = () => {
     fetch(FIREBASE_URL)
       .then(res => res.json())
@@ -208,7 +223,11 @@ const GetInfo=() => {
   ];
   
   const HandleExampleProcessing=() => {
-    setIsExampleProcessing(true);
+    // Copy example data to formData instead of just setting a flag
+    setFormData({
+      ...ExampleJsonData
+    });
+    setIsExampleProcessing(false); // Set to false so all features work normally
     const newSet=new Set();
     for (let i=0; i < 8; i++) {
       newSet.add(i);
@@ -219,15 +238,25 @@ const GetInfo=() => {
   const handleVerify=(e) => {
     if (e.key === "Enter" || e.key=="Tab" || pin.length==6) {  
       if (pin === "2025") {
-        toast.success("Authorized", {
+        setExampleJsonData(JsonFiles[0]); // Load Prashant's data
+        toast.success("Authorized - Prashant's data loaded", {
           duration: 3000,
           position: "top-right",
         });
         setError(false)
         setShowInput(false)
         HandleExampleProcessing(); 
-      }else{
-        toast.error("Pin is incorrect. Authorization declined!", {
+      } else if (pin === "2026") {
+        setExampleJsonData(JsonFiles[1]); // Load Nishant's data
+        toast.success("Authorized - Nishant's data loaded", {
+          duration: 3000,
+          position: "top-right",
+        });
+        setError(false)
+        setShowInput(false)
+        HandleExampleProcessing(); 
+      } else {
+        toast.error("Pin is incorrect. try 2025 or 2026!", {
           duration: 3000,
           position: "top-right",
         });
@@ -235,10 +264,6 @@ const GetInfo=() => {
       }
     }
   };
-
-  if (UserjsonData && !isExampleProcessing){
-    HandleExampleProcessing();
-  }
 
   useEffect(() => { // || !formData.contactInfo.fullName
     if (!formData.selectedTemplate) return;
@@ -449,7 +474,6 @@ const GetInfo=() => {
                     placeholder="Your name"
                     value={isExampleProcessing ? ExampleJsonData.contactInfo.fullName : formData.contactInfo.fullName}
                     onChange={(val) => {handleInputChange("contactInfo", "fullName", val);}}
-                    suggestions={['Aarav', 'Aarohi','Tanishk','Piyush', 'Abhimanyu', 'Abhishek', 'Abraham', 'Adarsh', 'Aditi', 'Aditya', 'Agarwal', 'Aisha','Ajay', 'Ali', 'Alisha', 'Amit', 'Ananya', 'Aniket', 'Anirudh', 'Anitha', 'Ankush', 'Ansari','Anupam', 'Aparna', 'Arindam', 'Arjun', 'Armaan', 'Arpita', 'Arvind', 'Aryan', 'Ashu', 'Ashwin', 'Asmita','Atul', 'Ayaan', 'Ayesha', 'Bajwa', 'Baljit', 'Bandyopadhyay', 'Bansal', 'Barot', 'Bhardwaj', 'Bhatt','Bhattacharya', 'Bhavesh', 'Bhavin','Kashiram', 'Bhavna', 'Bhawna', 'Bhumi', 'Bose', 'Brar', 'Chaitali', 'Chakraborty','Chatterjee', 'Chauhan', 'Chintan', 'Chirag', 'Choudhary', 'Chowdary', "D'Souza", 'Das', 'Dave', 'Deb','Deepak', 'Desai', 'Dev', 'Dhaval', 'Dhillon', 'Dias', 'Dinesh', 'Dipankar', 'Divya', 'Divyashree', 'Dubey','Dutta', 'Dwivedi', 'Faizan', 'Farooqi', 'Fatima', 'Fernandes', 'Gagandeep', 'Gaurav', 'George', 'Ghosh','Gill', 'Gohil', 'Gowda', 'Goyal', 'Grewal', 'Gupta', 'Gurpreet', 'Hari', 'Harleen', 'Harpreet', 'Harsh','Harshita', 'Hemant', 'Hussain', 'Ipsita', 'Irfan', 'Ishita', 'Iyengar', 'Iyer', 'Jadeja', 'Jasleen', 'Jatin','Jha', 'Jignesh', 'Joseph', 'Joshi', 'Juhi', 'Karthik', 'Karthikeyan', 'Kaur', 'Kavita', 'Keerthi', 'Khan','Kiran', 'Kiranpreet', 'Komal', 'Krishna', 'Krishnan', 'Kriti', 'Kulshreshtha', 'Kumar', 'Kunal', 'Laboni','Lakshmi', 'Lakshya', 'Lata', 'Lavanya', 'Madhavan', 'Madhumita', 'Mahajan', 'Mahesh', 'Mallika', 'Manish','Manisha', 'Mann', 'Manpreet', 'Mathew', 'Meenakshi', 'Meera', 'Mehta', 'Menon', 'Mirza', 'Mishra', 'Mitali','Mitra', 'Modi', 'Mohan', 'Mondal', 'Moumita', 'Mrunal', 'Mudaliar', 'Mukherjee', 'Murthy', 'Naidu', 'Nair','Naveen', 'Navjot', 'Nazma', 'Neha', 'Nidhi', 'Nigam', 'Nikhil', 'Nikita', 'Nishant', 'Pal', 'Pallavi','Pandey', 'Parmar', 'Parminder', 'Parth', 'Patel', 'Pathak', 'Paul', 'Payal', 'Pereira', 'Pillai', 'Piyali','Pooja', 'Prachi', 'Prajapati', 'Prakash', 'Prasad','Prashant','Nishant','Umeroddin','Sudhanshu','Preeti', 'Prithwish', 'Priya', 'Qureshi', 'Rabia','Radha', 'Radhika', 'Raghav', 'Rahul', 'Raj', 'Rajesh', 'Rajinikanth', 'Rajiv', 'Rajput', 'Ramesh', 'Rana','Rao', 'Rastogi', 'Rathod', 'Ravi', 'Ravneet', 'Rawat', 'Reddy', 'Rehan', 'Rekha', 'Revathi', 'Ritesh','Ritwik', 'Riya', 'Rodrigues', 'Rohan', 'Roy', 'Rupa', 'Rupali', 'Sagar', 'Sameer', 'Sana', 'Sanchari','Sandeep', 'Sandhu', 'Sanya', 'Sarkar', 'Satnam', 'Saxena', 'Sen', 'Shah', 'Shahid', 'Shalini', 'Sharma','Sheikh', 'Shetty', 'Shivam', 'Shruthi', 'Shruti', 'Siddharth', 'Siddiqui', 'Sidhu', 'Simran', 'Simranjeet','Sindhu', 'Singh', 'Sinha', 'Sneha', 'Solanki', 'Sonali', 'Sourav', 'Sowmya', 'Srinivas', 'Srivastava','Subham', 'Subramanian', 'Sumit', 'Sumita', 'Supriya', 'Surbhi', 'Suresh', 'Surya', 'Sutapa', 'Suthar','Swamy', 'Swati', 'Syed', 'Tanmoy', 'Tanvi', 'Tanya', 'Tejas', 'Thakkar', 'Thakur', 'Thomas', 'Tiwari','Tripathi', 'Trisha', 'Urmila', 'Vaishnavi', 'Varun', 'Venkatesh', 'Verma', 'Vidya', 'Vihaan', 'Vikas','Vikram', 'Vivaan', 'Yadav', 'Yash', 'Zaid', 'Zara','Akhil', 'Anmol', 'Bhupinder', 'Chandan', 'Charan', 'Chinmay', 'Darshan', 'Deeksha', 'Diksha', 'Ekta','Eshan', 'Girish', 'Gunjan', 'Hemlata', 'Indira', 'Ishaan', 'Jayant', 'Jaya', 'Jeet', 'Jyoti', 'Kalyani','Kamlesh', 'Kanika', 'Karishma', 'Kaustubh', 'Khushboo', 'Kishore', 'Kriti', 'Leela', 'Madhuri', 'Mahima','Mala', 'Mangesh', 'Manju', 'Mehul', 'Mohit', 'Monika', 'Mridula', 'Namita', 'Nandini', 'Nayan', 'Nisha','Nishita', 'Omkar', 'Pankaj', 'Poojan', 'Pranav', 'Prerna', 'Radheshyam', 'Rajani', 'Rajendra', 'Rani','Ravindra', 'Ritika', 'Rohit', 'Roshni', 'Sahil', 'Saloni', 'Sampath', 'Sanket', 'Sarika', 'Seema','Sharad', 'Sharanya', 'Sharvani', 'Shashi', 'Sheetal', 'Shraddha', 'Shreyas', 'Snehal', 'Sonal', 'Sonam','Sudha', 'Sujata', 'Surabhi', 'Surbhi', 'Tanisha', 'Tarun', 'Tina', 'Uday', 'Upasana', 'Utkarsh', 'Vaibhav','Vasudha', 'Veena', 'Vibha', 'Vidushi', 'Vimal', 'Vishal', 'Vishesh', 'Yogesh','Sonar','Parshuramkar','Inamdar','Khan','Inamdar']}
                     isPara={true}
                   />
                 </div>
@@ -460,7 +484,7 @@ const GetInfo=() => {
                 <label className="block text-sm font-medium dark:text-slate-300">Phone Number</label>
                 <input
                   type="number"
-                  placeholder="96XXXX8439"
+                  placeholder="96XXXXXXXX"
                   className={`w-full sm:p-2 sm:px-6 border rounded peer px-3 py-2 focus:outline-none focus:ring-2 ${isInvalidMob?"focus:ring-red-500":"focus:ring-blue-500"}  dark:bg-gray-800 dark:text-white dark:border-gray-600 
                   [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none`}
                   value={isExampleProcessing ? ExampleJsonData.contactInfo.phoneNumber : formData.contactInfo.phoneNumber}
@@ -830,18 +854,6 @@ const GetInfo=() => {
         if (!isExampleProcessing){
           {(i===11 || i===10) && setI(12)}
           return (
-            <OptionalSection
-              sectionType="projects"
-              sectionTitle="Projects"
-              sectionDescription="Showcase your practical work and technical accomplishments"
-              userProfile={{
-                jobTitle: formData.contactInfo.jobTitle,
-                hasExperience: formData.workExperience.some(exp => exp.jobTitle)
-              }}
-              onSkip={() => {
-                setCurrentStep(currentStep + 1);
-              }}
-            >
               <div className="space-y-4">
                 <h2 className="text-xl sm:text-2xl font-bold border-b-4 pb-1 border-blue-900 text-blue-800 dark:border-blue-500 dark:text-blue-400">Projects</h2>
                 <p className='font-semibold mb-6 text-gray-600 dark:text-gray-200'>Hint: Add {formData.workExperience.length>2?'at-last':'atleast'} {5-formData.workExperience.length} projects which you did in your Academics / WorkLife</p>
@@ -905,7 +917,6 @@ const GetInfo=() => {
                 <Plus size={16} /> Add Projects
               </button>
               </div>
-            </OptionalSection>
           );
         } else {
           return (
@@ -1145,7 +1156,7 @@ const GetInfo=() => {
                           placeholder="Bachelor of Technology (B.Tech)"
                           value={edu.degreeName}
                           onChange={(val) => handleInputChange('education', 'degreeName', val, index)}
-                          suggestions={["Bachelor of Science (B.Sc)","Primary/Secondary","Bachelor of Technology (B.Tech)","Bachelor of Engineering (B.E)","Bachelor of Arts (B.A)","Bachelor of Commerce (B.Com)","Bachelor of Computer Applications (BCA)","Bachelor of Business Administration (BBA)","Bachelor of Fine Arts (BFA)","Bachelor of Design (B.Des)","Bachelor of Architecture (B.Arch)","Bachelor of Pharmacy (B.Pharm)","Bachelor of Laws (LLB)","Bachelor of Hotel Management (BHM)","Bachelor of Social Work (BSW)","Bachelor of Education (B.Ed)","Bachelor of Physical Education (B.P.Ed)","Bachelor of Science in Nursing (B.Sc Nursing)","Master of Science (M.Sc)","Master of Technology (M.Tech)","Master of Engineering (M.E)","Master of Computer Applications (MCA)","Master of Arts (M.A)","Master of Commerce (M.Com)","Master of Business Administration (MBA)","Master of Fine Arts (MFA)","Master of Design (M.Des)","Master of Architecture (M.Arch)","Master of Pharmacy (M.Pharm)","Master of Laws (LLM)","Master of Social Work (MSW)","Master of Education (M.Ed)","Master of Physical Education (M.P.Ed)","Master of Science in Nursing (M.Sc Nursing)","Master of Public Health (MPH)","Master of Data Science (MDS)","Master of Finance (MFin)","Master of Management Studies (MMS)","Master of Computer Science (MCS)"]}
+                          suggestions={["Bachelor of Science (B.Sc)","Primary/Secondary","Bachelor of Technology (B.Tech)","Bachelor of Engineering (B.E)","Bachelor of Arts (B.A)","Bachelor of Commerce (B.Com)","Bachelor of Computer Applications (BCA)","Bachelor of Business Administration (BBA)","Bachelor of Fine Arts (BFA)","Bachelor of Design (B.Des)","Bachelor of Architecture (B.Arch)","Bachelor of Pharmacy (B.Pharm)","Bachelor of Laws (LLB)","Bachelor of Hotel Management (BHM)","Bachelor of Social Work (BSW)","Bachelor of Education (B.Ed)","Bachelor of Physical Education (B.P.Ed)","Bachelor of Science in Nursing (B.Sc Nursing)","Master of Science (M.Sc)","Master of Technology (M.Tech)","Master of Engineering (M.E)","Master of Computer Applications (MCA)","Master of Arts (M.A)","Master of Commerce (M.Com)","Master of Business Administration (MBA)","Master of Fine Arts (MFA)","Master of Design (M.Des)","Master of Architecture (M.Arch)","Master of Pharmacy (M.Pharm)","Master of Laws (LLM)","Master of Social Work (MSW)","Master of Education (M.Ed)","Master of Physical Education (M.P.Ed)","Master of Science in Nursing (M.Sc Nursing)","Master of Public Health (MPH)","Master of Data Science (MDS)","Master of Finance (MFin)","Master of Management Studies (MMS)","Master of Computer Science (MCS)","Doctor of Philosophy (Ph.D)","Doctor of Medicine (MD)","Doctor of Dental Surgery (DDS)","Doctor of Veterinary Medicine (DVM)","Diploma in Engineering/Technology","Diploma in Pharmacy","Diploma in Nursing","Certificate Courses","Vocational Training","High School Diploma","Secondary School Certificate (SSC)","Higher Secondary Certificate (HSC)"]}
                           isMultiSuggestion={false}
                         />
                       </div>
@@ -1178,10 +1189,10 @@ const GetInfo=() => {
                     </div>
                       
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium dark:text-slate-300">Current CGPA</label>
+                      <label className="block text-sm font-medium dark:text-slate-300">CGPA or Percentage</label>
                       <input
                         type="text"
-                        placeholder='?? / 10'
+                        placeholder='e.g., 8.5 or 85.5'
                         className={`w-full sm:px-6 sm:p-2 border rounded peer px-3 py-2 focus:outline-none focus:ring-2 ${isInvalidCGPA?"focus:ring-red-500":"focus:ring-blue-500"} dark:bg-gray-800 dark:text-white dark:border-gray-600`}
                         value={edu.currentCGPA}
                         onChange={(e) => {
@@ -1189,9 +1200,10 @@ const GetInfo=() => {
                           if(i===15 && index===1) setI(16)
                         }}
                         onBlur={(e) => {
-                          const value=e.target.value;
-                          if (!/^\s*([0-9](\.\d{1})?|10(\.0)?)\s*$/.test(value)) {
-                            toast.error("Invalid format! \nUse as 7 or 8.3 and less then 10", { duration: 3000, position: "top-right" });
+                          const value=e.target.value.trim();
+                          const numValue = parseFloat(value);
+                          if (!/^\d+(\.\d+)?$/.test(value) || numValue < 1 || numValue > 100) {
+                            toast.error("Invalid format! Enter a value between 1 and 100 (e.g., 8.5 or 85.5)", { duration: 3000, position: "top-right" });
                             e.target.focus(); 
                             setIsInvalidCGPA(true);
                           }else{
@@ -1284,7 +1296,7 @@ const GetInfo=() => {
                       <label className="block text-sm font-medium dark:text-slate-300">Current CGPA</label>
                       <input
                         type="text"
-                        placeholder='?? / 10'
+                        placeholder='e.g., 8.5 or 85.5'
                         className={`w-full sm:px-6 sm:p-2 border rounded peer px-3 py-2 focus:outline-none focus:ring-2 ${isInvalidCGPA?"focus:ring-red-500":"focus:ring-blue-500"} dark:bg-gray-800 dark:text-white dark:border-gray-600`}
                         value={edu.currentCGPA}
                         onChange={(e) => {
@@ -1292,9 +1304,10 @@ const GetInfo=() => {
                           if(i===15 && index===1) setI(16)
                         }}
                         onBlur={(e) => {
-                          const value=e.target.value;
-                          if (!/^\s*([0-9](\.\d{1})?|10(\.0)?)\s*$/.test(value)) {
-                            toast.error("Invalid format! \nUse as 7 or 8.3 and less then 10", { duration: 3000, position: "top-right" });
+                          const value=e.target.value.trim();
+                          const numValue = parseFloat(value);
+                          if (!/^\d+(\.\d+)?$/.test(value) || numValue < 1 || numValue > 100) {
+                            toast.error("Invalid format! Enter a value between 1 and 100 (e.g., 8.5 or 85.5)", { duration: 3000, position: "top-right" });
                             e.target.focus(); 
                             setIsInvalidCGPA(true);
                           }else{
@@ -1327,19 +1340,6 @@ const GetInfo=() => {
         if (!isExampleProcessing){
           {(i===16 || i===15) && setI(17)}
           return (
-            <OptionalSection
-              sectionType="certificates"
-              sectionTitle="Certificates"
-              sectionDescription="Professional certifications that validate your expertise"
-              userProfile={{
-                jobTitle: formData.contactInfo.jobTitle,
-                hasExperience: formData.workExperience.some(exp => exp.jobTitle)
-              }}
-              onSkip={() => {
-                // Move to next step
-                setCurrentStep(currentStep + 1);
-              }}
-            >
               <div className="space-y-4">
                 <h2 className="text-xl sm:text-2xl font-bold border-b-4 pb-1 border-blue-900 mb-4 text-blue-800 dark:border-blue-500 dark:text-blue-400">Certificates</h2>
                 <p className='font-semibold mb-6 text-gray-600 dark:text-gray-200'>Hint: Add atleast 5 high rated certificates</p>
@@ -1418,7 +1418,6 @@ const GetInfo=() => {
                 <Plus size={16} /> Add Certifications
               </button>
               </div>
-            </OptionalSection>
           );
         } else {
           return (

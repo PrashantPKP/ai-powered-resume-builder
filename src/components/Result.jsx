@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import toast from "react-hot-toast";
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { html as html_beautify } from 'js-beautify';
 import {T1,T1Css} from './T1.jsx';
 import {T2,T2Css} from './T2.jsx';
@@ -19,6 +19,7 @@ const Result = () => {
   const [downloadStatus, setDownloadStatus] = useState({ pdf: false, html: false });
   const [showDownloadModal, setShowDownloadModal] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
   const [isBuilt, setIsBuilt] = useState(false);
   const { jsonData, originalData, versionType } = location.state || {};
   const navigateToDiv = useRef(null);
@@ -234,11 +235,11 @@ const Result = () => {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen w-full bg-gray-100 dark:bg-slate-800 px-4 py-8 transition-colors duration-300">
-      {/* Always render the template but keep it hidden during loading */}
+      {/* Always render the template but keep it visible with proper sizing */}
       <div 
         id="capture-content" 
-        className={`text-left transition-all duration-300 ${status === 'completed' ? 'relative visible scale-[0.4] md:scale-[0.6]' : 'absolute invisible scale-[0.4] md:scale-[0.6]'}`}
-        style={{ transformOrigin: 'center' }}
+        className={`text-left transition-all duration-300 bg-white rounded-lg shadow-2xl p-8 ${status === 'completed' ? 'relative visible' : 'absolute invisible'}`}
+        style={{ width: '950px', maxWidth: '95%' }}
       >
         {jsonData && renderSelectedTemplate()}
       </div>
@@ -279,8 +280,8 @@ const Result = () => {
           </div>
         ) : (
           // Show success message when completed
-          <div ref={navigateToDiv} className="w-full flex flex-col items-center">
-            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative w-full mb-4 text-left">
+          <div ref={navigateToDiv} className="w-full flex flex-col items-center mt-8">
+            <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative w-full mb-6 text-left">
               <span className="block sm:inline">
                 🎉 Your {versionType === 'enhanced' ? 'AI-Enhanced' : 'Original'} resume is ready! Choose your preferred format below to download.
                 {versionType === 'enhanced' && <><br />🤖 This version includes AI improvements: enhanced content, keywords, and professional formatting.</>}
@@ -296,7 +297,12 @@ const Result = () => {
               </button>
               <button 
                 className="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded"
-                onClick={() => window.history.back()}
+                onClick={() => navigate('/GetInfo', { 
+                  state: { 
+                    jsonData: jsonData,
+                    fromResult: true
+                  } 
+                })}
               >
                 ← Back to Editor
               </button>

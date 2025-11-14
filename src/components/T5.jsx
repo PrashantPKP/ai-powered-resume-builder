@@ -2,6 +2,15 @@
 import React from 'react';
 import styled from "styled-components";
 
+// Helper function to convert markdown to HTML
+const parseMarkdown = (text) => {
+  if (!text || typeof text !== 'string') return '';
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>') // Bold
+    .replace(/\*(.+?)\*/g, '<em>$1</em>') // Italic
+    .replace(/\n/g, ' '); // Convert line breaks to spaces for continuous text
+};
+
 const StyledWrapper=styled.div`* {
   box-sizing: border-box;
   margin: 0;
@@ -178,6 +187,7 @@ export const T5 = ({ jsonData, desc }) => {
         <p>{jsonData.Description.UserDescription}</p>
       </div>
 
+      {jsonData.workExperience && jsonData.workExperience.length > 0 && jsonData.workExperience[0].companyName && (
       <div className="experience">
         <h3><b>Work Experience</b></h3>
         {jsonData.workExperience.map((exp, index) => (
@@ -189,11 +199,12 @@ export const T5 = ({ jsonData, desc }) => {
                 </h4>
               </li>
               {/* Assuming keyAchievements is a string of HTML that needs to be rendered */}
-              <div dangerouslySetInnerHTML={{ __html: exp.keyAchievements }} />
+              <div dangerouslySetInnerHTML={{ __html: parseMarkdown(exp.keyAchievements) }} />
             </ul>
           </div>
         ))}
       </div>
+      )}
 
       <div className="education-section">
         <h3><b>Education</b></h3>
@@ -220,53 +231,28 @@ export const T5 = ({ jsonData, desc }) => {
               <span style={{ marginRight: "8px", color: "#007acc" }}>➤</span>
               <b>{proj.projectTitle}</b>
             </h4>
-            <p style={{ marginLeft: "24px", marginTop: "4px" }}>{proj.toolsTechUsed}</p>
+            <p style={{ marginLeft: "24px", marginTop: "4px" }} dangerouslySetInnerHTML={{ __html: parseMarkdown(proj.toolsTechUsed) }} />
           </div>
         ))}
       </div>
 
+      {jsonData.certificates && jsonData.certificates.length > 0 && jsonData.certificates[0].certificateName && (
       <div className="Certifications">
         <h3><b>Certifications</b></h3>
-        <div className="flexConts Certificate-item">
-          <div className='mar-30'>
-            {jsonData.certificates.map((cert, index) => (
-              <React.Fragment key={index}>
-                {index > 0 && <br />}
+        <div className="Certificate-item">
+          {jsonData.certificates.map((cert, index) => (
+            <div key={index} style={{ marginBottom: '12px' }}>
+              <div style={{ fontWeight: 'bold', color: '#1a1a1a' }}>
                 {cert.certificateName}
-              </React.Fragment>
-            ))}
-            <br />
-            <a className="DecorationNone" href="#" target="_blank" rel="noreferrer">More Certificates</a>
-          </div>
-          <div className='mar-30'>
-            {jsonData.certificates.map((_, index) => (
-              <React.Fragment key={index}>
-                {index > 0 && <br />}
-                --
-              </React.Fragment>
-            ))}
-            <br />
-          </div>
-          <div className='mar-30'>
-            {jsonData.certificates.map((cert, index) => (
-              <React.Fragment key={index}>
-                {index > 0 && <br />}
-                {cert.providerName}
-              </React.Fragment>
-            ))}
-            <br />
-          </div>
-          <div className='mar-30 fontLight'>
-            {jsonData.certificates.map((cert, index) => (
-              <React.Fragment key={index}>
-                {index > 0 && <br />}
-                ({cert.courseDuration})
-              </React.Fragment>
-            ))}
-            <br />
-          </div>
+              </div>
+              <div style={{ color: '#4a4a4a', fontSize: '0.9em' }}>
+                {cert.providerName} - ({cert.courseDuration})
+              </div>
+            </div>
+          ))}
         </div>
       </div>
+      )}
 
       <div className="skills">
         <h3><b>Skills</b></h3>
