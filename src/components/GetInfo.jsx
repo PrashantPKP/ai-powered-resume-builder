@@ -16,7 +16,6 @@ import {T6} from './T6.jsx';
 import ChatBot from './ChatBot.jsx';
 import AIAnalysis from './AIAnalysis.jsx';
 import AISuggestions from './AISuggestions.jsx';
-import DatePicker from './DatePicker.jsx';
 import DownloadModal from './DownloadModal.jsx';
 
 const GetInfo=() => {
@@ -47,7 +46,8 @@ const GetInfo=() => {
       portfolio: '',
       jobTitle: '',
       Languages: '',
-      Location: ''
+      Location: '',
+      profileImage: ''
     },
     skills: {
       hardSkills: '',
@@ -161,23 +161,22 @@ const GetInfo=() => {
   }, [i]);
 
   
-  const FIREBASE_RESUMES_URL = import.meta.env.VITE_FIREBASE_RESUMES_URL;
-
+  // Use environment variable for Firebase URL
+  // const FIREBASE_URL = process.env.REACT_APP_FIREBASE_BUILT_URL || "https://your-firebase-url.firebaseio.com/ResumesBuilt.json";
 
   useEffect(() => {
-    if (!FIREBASE_RESUMES_URL) {
-      console.warn('VITE_FIREBASE_RESUMES_URL is not configured. Skipping resume count fetch.');
-      return;
-    }
-
-    fetch(FIREBASE_RESUMES_URL)
+    // Firebase URL should be set in environment variables
+    // Uncomment the following code after adding REACT_APP_FIREBASE_BUILT_URL to your .env file
+    /*
+    fetch(FIREBASE_URL)
       .then(res => res.json())
       .then(current => {
-        setResumesBuilt(current || 0);
+        setResumesBuilt(current || 0);  // Show existing count
       })
       .catch(error => {
         console.error("Error fetching resume count:", error);
       });
+    */
   }, []);
 
   // Load data when coming back from Result or Preview page
@@ -195,31 +194,27 @@ const GetInfo=() => {
     }
   }, [UserjsonData, location.state]);
 
-  const updateResumeCount = () => {
-    if (!FIREBASE_RESUMES_URL) {
-      console.warn('VITE_FIREBASE_RESUMES_URL is not configured. Skipping resume counter update.');
-      return;
-    }
-
-    fetch(FIREBASE_RESUMES_URL)
-      .then(res => res.json())
-      .then(current => {
-        const updated = (current || 0) + 1;
-
-        return fetch(FIREBASE_RESUMES_URL, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(updated),
-        }).then(() => {
-          setResumesBuilt(updated);
-        });
-      })
-      .catch(error => {
-        console.error("Error updating resume count:", error);
-      });
-  };
+  // Firebase function disabled - use environment variables instead
+  // const updateResumeCount = () => {
+  //   fetch(FIREBASE_URL)
+  //     .then(res => res.json())
+  //     .then(current => {
+  //       const updated = (current || 0) + 1;
+  //
+  //       return fetch(FIREBASE_URL, {
+  //         method: "PUT",
+  //         headers: {
+  //           "Content-Type": "application/json"
+  //         },
+  //         body: JSON.stringify(updated),
+  //       }).then(() => {
+  //         setResumesBuilt(updated);  // update UI
+  //       });
+  //     })
+  //     .catch(error => {
+  //       console.error("Error updating resume count:", error);
+  //     });
+  // };
   
   const steps=[
     { title: 'Choose a template that suits you best', key: 'Template' },
@@ -443,7 +438,7 @@ const GetInfo=() => {
         }
       }
 
-      updateResumeCount();
+      // updateResumeCount(); // Disabled - use environment variables instead
       
       // Navigate to preview page instead of showing side panel
       navigate('/Preview', {
@@ -580,6 +575,45 @@ const GetInfo=() => {
                 </div>
                 <div className="ml-4 w-0 h-1 rounded-full bg-blue-500 transition-all duration-300 peer-hover:w-[60%] peer-focus:w-[88%] sm:peer-focus:w-[94%]"></div>
               </div>
+
+              {/* Profile Image Upload - Only for Template 4 */}
+              {(isExampleProcessing ? ExampleJsonData.selectedTemplate === '4' : formData.selectedTemplate === '4') && (
+                <div className="space-y-2 mt-4 p-4 border-2 border-blue-200 rounded-lg bg-blue-50 dark:bg-slate-700 dark:border-blue-600">
+                  <label className="block text-sm font-medium dark:text-slate-300 flex items-center gap-2">
+                    <span>📸 Profile Picture (For Template 4)</span>
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:file:bg-slate-600 dark:file:text-slate-200"
+                    onChange={(e) => {
+                      const file = e.target.files[0];
+                      if (file) {
+                        if (file.size > 5000000) { // 5MB limit
+                          toast.error('Image size should be less than 5MB', { duration: 3000, position: 'top-right' });
+                          return;
+                        }
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                          handleInputChange('contactInfo', 'profileImage', reader.result);
+                          toast.success('Profile image uploaded successfully!', { duration: 2000, position: 'top-right' });
+                        };
+                        reader.readAsDataURL(file);
+                      }
+                    }}
+                  />
+                  {(isExampleProcessing ? ExampleJsonData.contactInfo.profileImage : formData.contactInfo.profileImage) && (
+                    <div className="mt-2">
+                      <img 
+                        src={isExampleProcessing ? ExampleJsonData.contactInfo.profileImage : formData.contactInfo.profileImage} 
+                        alt="Profile Preview" 
+                        className="w-32 h-32 rounded-full object-cover border-4 border-blue-500"
+                      />
+                    </div>
+                  )}
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Recommended: Square image, max 5MB (JPG, PNG)</p>
+                </div>
+              )}
           </div>
         );
 
@@ -710,22 +744,14 @@ const GetInfo=() => {
                       <label className="block text-sm font-medium dark:text-slate-300">Work Duration</label>
                       <input
                         type="text"
-                        placeholder="Dec-2023 to Apr-2025"
-                        className={`w-full sm:px-6 sm:p-2 border rounded peer px-3 py-2 focus:outline-none focus:ring-2 ${isInvalidWDuration?"focus:ring-red-500":"focus:ring-blue-500"} dark:bg-gray-800 dark:text-white dark:border-gray-600`}
+                        placeholder="E.g. January 2023 to Present or Dec-2023 to Apr-2025"
+                        className="w-full sm:px-6 sm:p-2 border rounded peer px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white dark:border-gray-600"
                         value={exp.WorkDuration}
-                        onChange={(e) => handleInputChange("workExperience", "WorkDuration", e.target.value, index)}
-                        onBlur={(e) => {
-                          const value=e.target.value;
-                          if (!/^\s*(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)-(\d{2,4})\s*to\s*(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)-(\d{2,4})\s*$/.test(value)) {
-                            toast.error("Invalid format!\n Use as Dec-2023 to Mar-2025", { duration: 3000, position: "top-right" });
-                            e.target.focus();
-                            setIsInvalidWDuration(true);
-                          }else{
-                            setIsInvalidWDuration(false);
-                          }
+                        onChange={(e) => {
+                          handleInputChange("workExperience", "WorkDuration", e.target.value, index);
                         }}
                       />
-                      <div className={`ml-4 w-0 h-1 rounded-full bg-blue-500 transition-all duration-300 peer-hover:w-[60%] peer-focus:w-[88%] sm:peer-focus:w-[94%] ${isInvalidWDuration?"bg-red-500":"bg-blue-500"}`}></div>
+                      <div className="ml-4 w-0 h-1 rounded-full bg-blue-500 transition-all duration-300 peer-hover:w-[60%] peer-focus:w-[88%] sm:peer-focus:w-[94%]"></div>
                     </div>
 
                     <div className="space-y-2">
@@ -1174,28 +1200,18 @@ const GetInfo=() => {
                     </div>
                 
                     <div className="space-y-2">
-                      <label className="block text-sm font-medium dark:text-slate-300">Graduation duration</label>
+                      <label className="block text-sm font-medium dark:text-slate-300">Graduation Duration</label>
                       <input
                         type="text"
-                        placeholder="2021 - 2025"
-                        className={`w-full sm:px-6 sm:p-2 border rounded peer px-3 py-2 focus:outline-none focus:ring-2 ${isInvalidGDuration?"focus:ring-red-500":"focus:ring-blue-500"} dark:bg-gray-800 dark:text-white dark:border-gray-600`}
+                        placeholder="E.g. 2021 - 2025 or 2025 or Present"
+                        className="w-full sm:px-6 sm:p-2 border rounded peer px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white dark:border-gray-600"
                         value={edu.graduationYear}
                         onChange={(e) => {
                           handleInputChange("education", "graduationYear", e.target.value, index);
                           if (i === 14 && index===0) setI(15);
                         }}                        
-                        onBlur={(e) => {
-                          const value=e.target.value;
-                          if (!/^\s*(\d{4})\s*-\s*(\d{4})\s*$/.test(value)) {
-                            toast.error("Invalid format! \nUse as 2023-2026", { duration: 3000, position: "top-right" });
-                            e.target.focus(); 
-                            setIsInvalidGDuration(true);
-                          }else{
-                            setIsInvalidGDuration(false)
-                          }
-                        }}
                       />
-                      <div className={`ml-4 w-0 h-1 rounded-full bg-blue-500 transition-all duration-300 peer-hover:w-[60%] peer-focus:w-[88%] sm:peer-focus:w-[94%] ${isInvalidGDuration?"bg-red-500":"bg-blue-500"}`}></div>
+                      <div className="ml-4 w-0 h-1 rounded-full bg-blue-500 transition-all duration-300 peer-hover:w-[60%] peer-focus:w-[88%] sm:peer-focus:w-[94%]"></div>
                     </div>
                       
                     <div className="space-y-2">

@@ -444,28 +444,44 @@ export const T1 = ({ jsonData }) => {
 
 export const T1Css=`
     @media print {
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+        color-adjust: exact !important;
+      }
+      
       body {
         font-family: Arial, sans-serif;
-        margin: 0;
+        margin: 0 !important;
+        padding: 0 !important;
         line-height: 1.25;
-        padding: 0;
         background-color: #f1f1f1 !important;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 1280px;
+        display: block !important;
+        height: auto !important;
+        width: 100% !important;
       }
+      
       @page {
-       size: 950px 1300px; 
+       size: A4 portrait;
        margin: 0;
       }
+      
       .resume {
-        margin-top: 10px;
-        width: 900px; 
-        border-radius: 15px;
-        border: 0px solid #ddd !important;
-        padding: 20px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        width: 210mm !important;
+        max-width: 210mm !important;
+        height: 297mm !important;
+        max-height: 297mm !important;
+        margin: 0 auto !important;
+        border-radius: 0 !important;
+        border: none !important;
+        padding: 15mm !important;
+        box-shadow: none !important;
+        page-break-after: avoid !important;
+        overflow: hidden !important;
+      }
+      
+      .header, .section {
+        page-break-inside: avoid !important;
       }
     }
     

@@ -3,13 +3,16 @@ import React, { useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { UploadCloud } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
+import { parseResume } from './ResumeParser';
 // import Switch from './TechNontechButton.jsx'
 
 const FileUploadPage = () => {
   const [jsonUploaded, setJsonUploaded] = useState(false);
   const [docUploaded, setDocUploaded] = useState(false);
+  const [htmlUploaded, setHtmlUploaded] = useState(false);
   // const [isTech, setIsTech] = useState(false);
   const [jsonData, setJsonData] = useState(null);
+  const [htmlFile, setHtmlFile] = useState(null);
   const navigate=useNavigate();
 
   const handleJSONUpload = async (event) => {
@@ -19,13 +22,17 @@ const FileUploadPage = () => {
       try {
         const text = await file.text();
         const parsedData = JSON.parse(text);
-        setJsonData(parsedData);
-        const actualKeys = Object.keys(parsedData);
+        
+        // Check if it has the old metadata wrapper format
+        const dataToCheck = parsedData.resumeData ? parsedData.resumeData : parsedData;
+        const actualKeys = Object.keys(dataToCheck);
+        
         if (expectedKeys.every((key) => actualKeys.includes(key))){
-           toast.success("JSON file uploaded successfully! and matched with our formate", { duration: 3000 , position: "top-right"});
+           setJsonData(dataToCheck);
+           toast.success("JSON file uploaded successfully! and matched with our format", { duration: 3000 , position: "top-right"});
            setJsonUploaded(true);
          }else{
-            toast.error("The provided json is not ours.", { duration: 3000,position: "top-right"});
+            toast.error("The provided JSON is not ours. Missing keys: " + expectedKeys.filter(k => !actualKeys.includes(k)).join(', '), { duration: 4000,position: "top-right"});
          }
       } catch (err) {
         toast.error("Invalid JSON file!", { duration: 3000,position: "top-right" });
@@ -63,14 +70,77 @@ const FileUploadPage = () => {
     URL.revokeObjectURL(url);
   }
 
-  const handleDocUpload = (event) => {
+  const handleDocUpload = async (event) => {
     const file = event.target.files[0];
-    if (file && (file.type.includes("pdf") || file.type.includes("word"))) {
-      setDocUploaded(true);
-      toast.success("Document uploaded successfully!", { duration: 3000,position: "top-right" });
-      // ParseData(file);
+    if (file && (file.type.includes("pdf") || file.type.includes("word") || file.name.endsWith('.docx'))) {
+      setDocUploaded(false);
+      const loadingToast = toast.loading("Parsing resume... This may take a few seconds.", { position: "top-right" });
+      
+      try {
+        const result = await parseResume(file);
+        
+        if (result.success) {
+          setJsonData(result.data);
+          setDocUploaded(true);
+          toast.dismiss(loadingToast);
+          toast.success("Resume parsed successfully! Review and edit the extracted data.", { 
+            duration: 4000, 
+            position: "top-right" 
+          });
+        } else {
+          toast.dismiss(loadingToast);
+          toast.error(`Parsing failed: ${result.error}`, { 
+            duration: 4000, 
+            position: "top-right" 
+          });
+        }
+      } catch (error) {
+        toast.dismiss(loadingToast);
+        toast.error("Failed to parse resume. Please try again or fill manually.", { 
+          duration: 4000, 
+          position: "top-right" 
+        });
+      }
     } else {
-      toast.error("Please upload a PDF or DOCX file.", { duration: 3000,position: "top-right" });
+      toast.error("Please upload a PDF or DOCX file.", { duration: 3000, position: "top-right" });
+    }
+  };
+
+  const handleHTMLUpload = async (event) => {
+    const file = event.target.files[0];
+    if (file && (file.type === "text/html" || file.name.endsWith('.html'))) {
+      try {
+        const text = await file.text();
+        
+        // Try to extract JSON data from HTML comments
+        const jsonMatch = text.match(/<!--\s*RESUME_DATA:\s*({[\s\S]*?})\s*-->/);
+        
+        if (jsonMatch && jsonMatch[1]) {
+          // Clean up the JSON string (remove HTML entities if any)
+          const jsonString = jsonMatch[1].replace(/--&gt;/g, '-->');
+          const parsedData = JSON.parse(jsonString);
+          const expectedKeys = ["contactInfo", "skills", "workExperience", "projects", "education", "certificates", "Description"];
+          const dataToCheck = parsedData.resumeData ? parsedData.resumeData : parsedData;
+          const actualKeys = Object.keys(dataToCheck);
+          
+          if (expectedKeys.every((key) => actualKeys.includes(key))) {
+            setJsonData(dataToCheck);
+            setHtmlUploaded(true);
+            toast.success("HTML file uploaded and data extracted successfully!", { duration: 3000, position: "top-right" });
+          } else {
+            // HTML doesn't have valid embedded data
+            toast.error("This HTML file doesn't contain valid resume data. Please upload our generated HTML file.", { duration: 4000, position: "top-right" });
+          }
+        } else {
+          // No embedded data found
+          toast.error("This HTML file doesn't contain embedded resume data. Please upload our generated HTML file.", { duration: 4000, position: "top-right" });
+        }
+      } catch (err) {
+        console.error('HTML parsing error:', err);
+        toast.error("Error processing HTML file!", { duration: 3000, position: "top-right" });
+      }
+    } else {
+      toast.error("Please upload a valid HTML file.", { duration: 3000, position: "top-right" });
     }
   };
 
@@ -149,21 +219,40 @@ const FileUploadPage = () => {
     <div className="w-[90%] lg:w-4/5 mx-4 bg-gray-200 dark:bg-slate-800 rounded-xl shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between px-6 py-4 space-y-4 sm:space-y-0 hover:shadow-lg transition-shadow duration-300">
       <div className="w-full sm:w-auto lg:ml-14">
         <p className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-          {docUploaded ? "Document uploaded but!" : "Upload your existing resume to make parse most data from them"}
+          Convert manually edited HTML to PDF
+        </p>
+        <p className="text-md mt-1 font-semibold text-gray-500 dark:text-gray-400">
+          If you manually edited the downloaded HTML file, you can convert it to PDF using our HTML-to-PDF converter tool.
+        </p>
+      </div>
+      <button
+        className="w-full sm:w-auto px-5 py-2 lg:mr-14 bg-blue-600 text-white rounded-xl hover:bg-blue-700"
+        onClick={() => navigate("/HTML-PDF")}
+      >
+        Convert&nbsp;&gt;
+      </button>
+    </div>
+    <div className="w-[90%] lg:w-4/5 mx-4 bg-gray-200 dark:bg-slate-800 rounded-xl shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between px-6 py-4 space-y-4 sm:space-y-0 hover:shadow-lg transition-shadow duration-300">
+      <div className="w-full sm:w-auto lg:ml-14">
+        <p className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+          {docUploaded ? "Resume parsed successfully!" : "Upload your existing resume to parse data from it"}
         </p>
         <p className="text-md mt-1 font-semibold text-gray-500 dark:text-gray-400">
           {docUploaded
-            ? "You can't proceed with this feature now..."
-            : "This feature is based on an API by Affinda Resume Parser. We can't able to make this feature possible due to Security issue with API key and handling costs..."}
+            ? "Data extracted! Review and edit before proceeding."
+            : "Upload PDF or DOCX resume. Our AI will extract and structure the data automatically (Free!)"}
         </p>
       </div>
       {docUploaded ? (
-        <button className="w-full lg:mr-14 sm:w-auto px-5 py-2 bg-red-600 text-white rounded-2xl hover:bg-red-700">
-         X Coming soon
+        <button
+          className="w-full lg:mr-14 sm:w-auto px-5 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700"
+          onClick={() => navigate("/GetInfo", { state: { jsonData } })}
+        >
+          Review & Edit &gt;
         </button>
       ) : (
         <label className="w-full lg:mr-12 sm:w-auto inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md cursor-pointer hover:bg-blue-700 transition duration-300">
-        <UploadCloud className="w-5 h-5 mr-2" /> .pdf/.docx
+          <UploadCloud className="w-5 h-5 mr-2" /> .pdf/.docx
           <input
             type="file"
             accept=".pdf,.doc,.docx"
@@ -176,17 +265,32 @@ const FileUploadPage = () => {
     <div className="w-[90%] lg:w-4/5 mx-4 bg-gray-200 dark:bg-slate-800 rounded-xl shadow-md flex flex-col sm:flex-row items-start sm:items-center justify-between px-6 py-4 space-y-4 sm:space-y-0 hover:shadow-lg transition-shadow duration-300">
       <div className="w-full sm:w-auto lg:ml-14">
         <p className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-          Make more minor adjustments to your resume
+          {htmlUploaded ? "HTML uploaded successfully" : "Upload HTML to extract and edit data"}
         </p>
         <p className="text-md mt-1 font-semibold text-gray-500 dark:text-gray-400">
-          Use the provided HTML/CSS format to make any minor changes. You can then convert it to PDF using our optimized HTML-to-PDF tool.</p>
+          {htmlUploaded 
+            ? "Data extracted successfully! You can now proceed to edit." 
+            : "Upload our generated HTML file to extract resume data and make edits."}
+        </p>
       </div>
-      <button
-        className="w-full sm:w-auto px-5 py-2 lg:mr-14 bg-blue-600 text-white rounded-xl hover:bg-blue-700"
-        onClick={() => navigate("/HTML-PDF")}
-      >
-        Continue&nbsp;&gt;
-      </button>
+      {htmlUploaded ? (
+        <button
+          className="w-full lg:mr-14 sm:w-auto px-5 py-2 bg-blue-600 text-white rounded-xl hover:bg-blue-700"
+          onClick={() => navigate("/GetInfo", { state: { jsonData } })}
+        >
+          Proceed to Edit &gt;
+        </button>
+      ) : (
+        <label className="w-full lg:mr-12 sm:w-auto inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md cursor-pointer hover:bg-blue-700 transition duration-300">
+          <UploadCloud className="w-5 h-5 mr-2" /> Our&nbsp;HTML
+          <input
+            type="file"
+            accept=".html,.htm"
+            onChange={handleHTMLUpload}
+            className="hidden"
+          />
+        </label>
+      )}
     </div>
   </div>
   

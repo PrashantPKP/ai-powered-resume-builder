@@ -30,9 +30,24 @@ const AISuggestions = ({ jobTitle = '', userData = {}, onApplySuggestion }) => {
       if (response.ok) {
         const data = await response.json();
         if (data.suggestions && Array.isArray(data.suggestions) && data.suggestions.length > 0) {
-          setSuggestions(data.suggestions);
-          setShowSuggestions(true);
-          toast.success('AI suggestions generated!');
+          // Ensure suggestions are strings, handle both string and object formats
+          const processedSuggestions = data.suggestions.map(suggestion => {
+            if (typeof suggestion === 'string') {
+              return suggestion;
+            } else if (typeof suggestion === 'object' && suggestion !== null) {
+              // If it's an object, try to extract text or title
+              return suggestion.text || suggestion.title || suggestion.description || JSON.stringify(suggestion);
+            }
+            return String(suggestion);
+          }).filter(s => s && s.trim() !== '');
+          
+          if (processedSuggestions.length > 0) {
+            setSuggestions(processedSuggestions);
+            setShowSuggestions(true);
+            toast.success('AI suggestions generated!');
+          } else {
+            throw new Error('No valid suggestions received');
+          }
         } else {
           throw new Error('No suggestions received');
         }
@@ -133,7 +148,13 @@ const AISuggestions = ({ jobTitle = '', userData = {}, onApplySuggestion }) => {
             exit={{ opacity: 0, height: 0 }}
             className="space-y-3 max-h-96 overflow-y-auto"
           >
-            {suggestions.map((suggestion, index) => (
+            {suggestions.map((suggestion, index) => {
+              // Ensure suggestion is a string before rendering
+              const suggestionText = typeof suggestion === 'string' 
+                ? suggestion 
+                : (suggestion?.text || suggestion?.title || suggestion?.description || String(suggestion));
+              
+              return (
               <motion.div
                 key={index}
                 initial={{ opacity: 0, x: -20 }}
@@ -142,11 +163,11 @@ const AISuggestions = ({ jobTitle = '', userData = {}, onApplySuggestion }) => {
                 className="bg-white dark:bg-gray-800 p-3 rounded-lg border border-gray-200 dark:border-gray-600 shadow-sm hover:shadow-md transition-shadow"
               >
                 <p className="text-sm text-gray-700 dark:text-gray-300 mb-3 leading-relaxed">
-                  {suggestion}
+                  {suggestionText}
                 </p>
                 <div className="flex gap-2">
                   <motion.button
-                    onClick={() => applySuggestion(suggestion)}
+                    onClick={() => applySuggestion(suggestionText)}
                     className="flex-1 bg-green-600 hover:bg-green-700 text-white py-1.5 px-3 rounded text-xs font-medium transition-colors"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -155,7 +176,7 @@ const AISuggestions = ({ jobTitle = '', userData = {}, onApplySuggestion }) => {
                     Use This
                   </motion.button>
                   <motion.button
-                    onClick={() => copySuggestion(suggestion)}
+                    onClick={() => copySuggestion(suggestionText)}
                     className="bg-blue-600 hover:bg-blue-700 text-white py-1.5 px-3 rounded text-xs font-medium transition-colors"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
@@ -164,7 +185,8 @@ const AISuggestions = ({ jobTitle = '', userData = {}, onApplySuggestion }) => {
                   </motion.button>
                 </div>
               </motion.div>
-            ))}
+              );
+            })}
           </motion.div>
         )}
       </AnimatePresence>

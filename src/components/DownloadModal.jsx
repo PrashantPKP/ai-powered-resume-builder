@@ -84,6 +84,7 @@ const DownloadModal = ({ isOpen, onClose, resumeData, selectedTemplate }) => {
       iframe.style.width = '0';
       iframe.style.height = '0';
       iframe.style.border = 'none';
+      iframe.style.visibility = 'hidden';
       document.body.appendChild(iframe);
       
       // Write content to iframe
@@ -93,25 +94,40 @@ const DownloadModal = ({ isOpen, onClose, resumeData, selectedTemplate }) => {
       iframeDoc.close();
       
       // Wait for content to load, then trigger print
+      let printTriggered = false;
+      
       iframe.contentWindow.onload = () => {
-        setTimeout(() => {
+        if (!printTriggered) {
+          printTriggered = true;
+          setTimeout(() => {
+            iframe.contentWindow.focus();
+            iframe.contentWindow.print();
+            
+            // Clean up after print dialog closes (give user time)
+            setTimeout(() => {
+              if (iframe.parentNode) {
+                document.body.removeChild(iframe);
+              }
+            }, 1000);
+          }, 500);
+        }
+      };
+      
+      // Fallback: trigger onload manually if it doesn't fire within 2 seconds
+      setTimeout(() => {
+        if (!printTriggered && iframe.parentNode) {
+          printTriggered = true;
           iframe.contentWindow.focus();
           iframe.contentWindow.print();
           
-          // Clean up after print dialog closes (give user time)
+          // Clean up
           setTimeout(() => {
-            document.body.removeChild(iframe);
+            if (iframe.parentNode) {
+              document.body.removeChild(iframe);
+            }
           }, 1000);
-        }, 500);
-      };
-      
-      // Fallback: trigger onload manually if it doesn't fire
-      setTimeout(() => {
-        if (iframe.parentNode) {
-          iframe.contentWindow.focus();
-          iframe.contentWindow.print();
         }
-      }, 1000);
+      }, 2000);
       
     } catch (error) {
       console.error('PDF download error:', error);
@@ -134,16 +150,19 @@ const DownloadModal = ({ isOpen, onClose, resumeData, selectedTemplate }) => {
   };
 
   const downloadJSON = async () => {
-    const jsonData = {
-      metadata: {
-        generatedOn: new Date().toISOString(),
-        template: selectedTemplate,
-        version: '1.0'
-      },
-      resumeData: resumeData
+    // Structure the JSON exactly as expected by FileUploadPage
+    const structuredData = {
+      selectedTemplate: selectedTemplate,
+      contactInfo: resumeData.contactInfo || {},
+      skills: resumeData.skills || { hardSkills: '', softSkills: '' },
+      workExperience: resumeData.workExperience || [],
+      projects: resumeData.projects || [],
+      education: resumeData.education || [],
+      certificates: resumeData.certificates || [],
+      Description: resumeData.Description || { UserDescription: '' }
     };
     
-    const jsonString = JSON.stringify(jsonData, null, 2);
+    const jsonString = JSON.stringify(structuredData, null, 2);
     const blob = new Blob([jsonString], { type: 'application/json' });
     downloadBlob(blob, 'resume-data.json', 'application/json');
   };
@@ -181,12 +200,25 @@ const DownloadModal = ({ isOpen, onClose, resumeData, selectedTemplate }) => {
                       resumeData.contactInfo?.name || 
                       'Resume';
       
+      // Prepare embedded JSON data for re-upload capability
+      const embeddedData = {
+        selectedTemplate: selectedTemplate,
+        contactInfo: resumeData.contactInfo || {},
+        skills: resumeData.skills || { hardSkills: '', softSkills: '' },
+        workExperience: resumeData.workExperience || [],
+        projects: resumeData.projects || [],
+        education: resumeData.education || [],
+        certificates: resumeData.certificates || [],
+        Description: resumeData.Description || { UserDescription: '' }
+      };
+      
       const generatedCode = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>${userName}</title>
+    <!-- RESUME_DATA: ${JSON.stringify(embeddedData).replace(/-->/g, '--&gt;')} -->
     <style>
       ${templateCss}
     </style>

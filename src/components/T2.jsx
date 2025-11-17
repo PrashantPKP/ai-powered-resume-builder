@@ -361,25 +361,45 @@ export const T2 = ({ jsonData }) => {
 
 export const T2Css=`
       @media print {
+        * {
+          -webkit-print-color-adjust: exact !important;
+          print-color-adjust: exact !important;
+          color-adjust: exact !important;
+        }
+        
         body {
-          margin-top: 10px !important;
+          margin: 0 !important;
+          padding: 0 !important;
           font-family: Arial, sans-serif;
           background: #E5E7EB !important;
           color: #333;
-          padding: 20px;
+          display: block !important;
+          height: auto !important;
+          width: 100% !important;
         }
+        
         @page {
-         size: 930px 1300px; 
+         size: A4 portrait;
          margin: 0;
         }
+        
         .resume-container {
-          width: 900px;
-          margin: 0 auto;
-          background: #E5E7EB;
-          border: 0px solid #ddd !important;
-          border-radius: 8px;
-          box-shadow: 0 0 0 rgba(0, 0, 0, 0.05) !important;
-          padding: 2rem;
+          width: 210mm !important;
+          max-width: 210mm !important;
+          height: 297mm !important;
+          max-height: 297mm !important;
+          margin: 0 auto !important;
+          background: #E5E7EB !important;
+          border: none !important;
+          border-radius: 0 !important;
+          box-shadow: none !important;
+          padding: 15mm !important;
+          page-break-after: avoid !important;
+          overflow: hidden !important;
+        }
+        
+        .header, .section {
+          page-break-inside: avoid !important;
         }
       }
       

@@ -252,7 +252,7 @@ export const T4 = ({ jsonData, desc }) => {
     <div className="resume" id="capture-content">
       <div className="header">
         <div className="left">
-          <img src="https://www.skibalawchicago.com/wp-content/uploads/2024/06/profile-placeholder.jpg" alt="Profile" />
+          <img src={jsonData?.contactInfo?.profileImage || "https://www.skibalawchicago.com/wp-content/uploads/2024/06/profile-placeholder.jpg"} alt="Profile" />
         </div>
 
         <div className="right">
@@ -422,28 +422,53 @@ export const T4 = ({ jsonData, desc }) => {
 
 export const T4Css=`
 @media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+  
   body {
      font-family: Arial, sans-serif;
-     margin: 0;
-     padding: 0;
+     margin: 0 !important;
+     padding: 0 !important;
      background-color: #ffffff !important;
-     display: flex;
-     justify-content: center;
-     align-items: stretch !important;
-     height: 100% !important; 
+     display: block !important;
+     height: auto !important;
+     width: 100% !important;
   }
+  
   @page {
-   size: auto 1220px; 
+   size: A4 portrait;
    margin: 0;
   }
+  
   .resume {
-     width: 900px;
-     background: #ffffff;
-     border: 1px solid #ffffff !important;
-     border-radius: 15px;
-     margin-top: 0px !important;
-     padding: 0 32px 0 0;
-     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+     width: 210mm !important;
+     max-width: 210mm !important;
+     height: 297mm !important;
+     max-height: 297mm !important;
+     background: #ffffff !important;
+     border: none !important;
+     border-radius: 0 !important;
+     margin: 0 auto !important;
+     padding: 0 !important;
+     box-shadow: none !important;
+     page-break-after: avoid !important;
+     page-break-inside: avoid !important;
+     overflow: hidden !important;
+  }
+  
+  .header {
+     page-break-inside: avoid !important;
+  }
+  
+  .content {
+     page-break-inside: avoid !important;
+  }
+  
+  .section, .item {
+     page-break-inside: avoid !important;
   }
 }
 

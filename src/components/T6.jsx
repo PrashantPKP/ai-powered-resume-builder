@@ -141,7 +141,7 @@ export const T6 = ({ jsonData }) => {
 
       <div className="Conts">
         <div className="title">Objectives:</div>
-              <Description dangerouslySetInnerHTML={{ __html: parseMarkdown(jsonData.Description.UserDescription) }} />
+              <div dangerouslySetInnerHTML={{ __html: parseMarkdown(jsonData.Description.UserDescription) }} />
       </div>
 
       <div className="Conts">
@@ -228,27 +228,44 @@ export const T6 = ({ jsonData }) => {
 
 export const T6Css=`
 @media print {
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+  }
+  
   body {
      font-family: Arial, sans-serif;
-     margin: 0;
-     padding: 0;
+     margin: 0 !important;
+     padding: 0 !important;
      background-color: #F1F5F9 !important;
-     display: flex;
-     justify-content: center;
-     align-items: center;
-     height: auto;        
+     display: block !important;
+     height: auto !important;
+     width: 100% !important;
   }
+  
   @page {
-   size: 950px 1300px; 
+   size: A4 portrait;
    margin: 0;
   }
+  
   .resume {
-     width: 900px;         
-     background: #F1F5F9;
-     border: 0px solid #ddd !important;
-     border-radius: 15px;
-     padding: 20px;
-     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+     width: 210mm !important;
+     max-width: 210mm !important;
+     height: 297mm !important;
+     max-height: 297mm !important;
+     background: #F1F5F9 !important;
+     border: none !important;
+     border-radius: 0 !important;
+     padding: 15mm !important;
+     box-shadow: none !important;
+     margin: 0 auto !important;
+     page-break-after: avoid !important;
+     overflow: hidden !important;
+  }
+  
+  .header, .section {
+    page-break-inside: avoid !important;
   }
 }
 

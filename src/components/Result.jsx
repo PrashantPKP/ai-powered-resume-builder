@@ -27,8 +27,8 @@ const Result = () => {
   const MAX_RETRIES = 3;
   const RETRY_DELAY = 10000; 
 
-  const FIREBASE_RESUMES_URL = import.meta.env.VITE_FIREBASE_RESUMES_URL;
-
+  // Use environment variable for Firebase URL
+  // const FIREBASE_URL = process.env.REACT_APP_FIREBASE_BUILT_URL || "https://your-firebase-url.firebaseio.com/ResumesBuilt.json";
 
   useEffect(() => {
     if (!jsonData) {
@@ -212,28 +212,28 @@ const Result = () => {
       generateAndDownloadFiles();
     }, 1000);
 
+    // Firebase update disabled - use environment variables instead
     // Updating resume count
-    if (!FIREBASE_RESUMES_URL) {
-      console.warn('VITE_FIREBASE_RESUMES_URL is not configured. Skipping resume counter update.');
-      return;
-    }
+    /*
+    fetch(FIREBASE_URL)
+    .then(res => res.json())
+    .then(current => {
+      const updated = (current || 0) + 1;
 
-    fetch(FIREBASE_RESUMES_URL)
-      .then(res => res.json())
-      .then(current => {
-        const updated = (current || 0) + 1;
-
-        return fetch(FIREBASE_RESUMES_URL, {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify(updated),
-        });
-      })
-      .catch(error => {
-        console.error("Error updating resume count:", error);
+      return fetch(FIREBASE_URL, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(updated),
+      }).then(() => {
+        // setResumesBuilt(updated);  // update UI
       });
+    })
+    .catch(error => {
+      console.error("Error updating resume count:", error);
+    });
+    */
   };
 
   return (

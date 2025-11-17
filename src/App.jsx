@@ -13,10 +13,10 @@ import ViewTemplates from './components/ViewTemplates.jsx';
 import HtmlToPdfConverter from './components/HmlToPdf.jsx'
 import FileUploadPage from './components/FileUploadPage.jsx';
 import Loader from './components/Loader.jsx'
+// import T5 from './components/T5.jsx'
 
-
-
-const FIREBASE_VIEWS_URL = import.meta.env.VITE_FIREBASE_VIEWS_URL;
+// Use environment variable for Firebase URL
+// const FIREBASE_URL = process.env.REACT_APP_FIREBASE_URL || "https://your-firebase-url.firebaseio.com/Views.json";
 
 const App = () => {
 
@@ -25,26 +25,22 @@ const App = () => {
   const [views, setViews] = useState(0);
 
   useEffect(() => {
-    if (!FIREBASE_VIEWS_URL) {
-      console.warn('VITE_FIREBASE_VIEWS_URL not configured. Skipping view-count updates.');
-      return;
-    }
-
-    fetch(FIREBASE_VIEWS_URL)
+    // Firebase URL should be set in environment variables
+    // Uncomment the following code after adding REACT_APP_FIREBASE_URL to your .env file
+    /*
+    fetch(FIREBASE_URL)
       .then(res => res.json())
       .then(current => {
         const updated = (current || 0) + 1;
         
-        fetch(FIREBASE_VIEWS_URL, {
+        fetch(FIREBASE_URL, {
           method: "PUT",
           body: JSON.stringify(updated),
         });
 
         setViews(updated);
-      })
-      .catch(error => {
-        console.error('Error updating view count:', error);
       });
+    */
   }, []);
 
   useEffect(() => {
@@ -67,7 +63,9 @@ const App = () => {
   }
 
   return (
-  
+    // <>
+    //   <FileUploadPage/>
+    // </>
     <div>
       <Toaster />
       <Routes>
