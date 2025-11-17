@@ -13,7 +13,7 @@ A modern, AI-powered resume builder application that helps users create professi
 - **Template 1:** Simpler and Structured
 - **Template 2:** Linear and Classic
 - **Template 3:** Colourful and Attractive
-- **Template 4:** Colourful and Highly Designed (⚠️ PDF alignment issues)
+- **Template 4:** Colourful and Highly Designed 
 - **Template 5:** Simpler and Linear
 - **Template 6:** Highly Simpler and Classic
 
