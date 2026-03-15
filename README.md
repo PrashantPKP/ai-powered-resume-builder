@@ -2,7 +2,7 @@
 
 A modern, AI-powered resume builder application that helps users create professional resumes with multiple templates, real-time preview, and AI suggestions.
 
-**Live Demo:** [https://prashantparshuramkar.host20.uk/Resume-builder/](https://prashantparshuramkar.host20.uk/Resume-builder/)
+**Live Demo:** https://resume.zapsas.info/
 
 ---
 
