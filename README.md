@@ -270,5 +270,5 @@ Contributions are welcome! Feel free to:
 ---
 **Made with ❤️ by Prashant Parshuramkar**
 
-© 2025 All rights reserved | [Live Demo](https://prashantparshuramkar.host20.uk/Resume-builder/)
+© 2025 All rights reserved | [Live Demo](https://resume.zapsas.info/)
 ---
