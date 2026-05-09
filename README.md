@@ -1,8 +1,8 @@
 # Resume Builder 🚀
 
-A modern, AI-powered resume builder application that helps users create professional resumes with multiple templates, real-time preview, and AI suggestions.
+A modern, AI-assisted resume builder that helps create professional resumes with multiple templates, resume parsing, and AI suggestions.
 
-**Live Demo:** https://resume.zapsas.info/
+**[Live Demo](https://resume.zapsas.info/)** | **[Portfolio](https://prashantparshuramkar.host20.uk/)**
 
 ---
 
@@ -12,8 +12,8 @@ A modern, AI-powered resume builder application that helps users create professi
 - 6 professionally designed templates to choose from
 - **Template 1:** Simpler and Structured
 - **Template 2:** Linear and Classic
-- **Template 3:** Colourful and Attractive
-- **Template 4:** Colourful and Highly Designed 
+- **Template 3:** Colorful and Attractive
+- **Template 4:** Colorful and Highly Designed
 - **Template 5:** Simpler and Linear
 - **Template 6:** Highly Simpler and Classic
 
@@ -46,7 +46,6 @@ A modern, AI-powered resume builder application that helps users create professi
 - **Data Persistence** - Resume data available during session
 
 ### 🔍 **Additional Features**
-- **Example Data** - Load sample resume for quick testing
 - **Multi-Step Form** - Guided step-by-step resume building
 - **Dark/Light Mode** - Toggle between themes
 - **Mobile Responsive** - Works on all devices
@@ -72,31 +71,27 @@ A modern, AI-powered resume builder application that helps users create professi
 ### Backend
 - **Flask** - Python web framework
 - **Flask-CORS** - Cross-Origin Resource Sharing
-- **Google Generative AI (Gemini)** - AI features
+- **Groq API** - AI features (via GROQ API keys)
 - **WeasyPrint/xhtml2pdf** - PDF generation
-
-### Database
-- **Firebase Realtime Database** - Data storage (optional, currently disabled)
 
 ---
 
-## 🚀 Getting Started
+## 🚀 Quickstart (local development)
 
 ### Prerequisites
-- **Node.js** (v16 or higher)
-- **Python** (v3.8 or higher)
-- **npm** or **yarn** package manager
-- **Git** for version control
 
-### Installation
+- Node.js (v16+)
+- Python (v3.8+)
+- npm or yarn
 
-#### 1. Clone the Repository
+### 1) Clone repository
+
 ```bash
 git clone https://github.com/PrashantPKP/ai-powered-resume-builder.git
-cd Resume-Builder
+cd ai-powered-resume-builder
 ```
 
-#### 2. Frontend Setup
+### 2) Frontend Setup
 
 ```bash
 # Install dependencies
@@ -111,54 +106,45 @@ npm run dev
 
 The frontend will run on `http://localhost:5173`
 
-#### 3. AI Backend Setup
+### 3) Backend (AI + API)
+
+The repository uses a single `backend` folder for Flask services. Configure API keys locally in `backend/.env` (this file should remain out of version control).
+
+Create `backend/.env` with your API key:
 
 ```bash
-# Navigate to AI backend directory
-cd AIBackend
+echo "GROQ_API_KEY=your_groq_api_key_here" > backend/.env
+```
 
-# Create environment file
-echo "GEMINI_API_KEY=your_gemini_api_key_here" > .env
+Install and run backend:
 
-# Install Python dependencies
+```bash
+cd backend
 pip install -r requirements.txt
-
-# Run the server
 python app.py
 ```
 
-The AI backend will run on `http://localhost:5001`
-
-#### 4. Regular Backend Setup (Optional)
-
-```bash
-# Navigate to backend directory
-cd Backend
-
-# Install Python dependencies
-pip install -r requirements.txt
-
-# Run the server
-python app.py
-```
-
-The backend will run on `http://localhost:5000`
+The backend defaults to `http://localhost:5000`.
 
 ---
 
-## 🔑 Environment Variables
+## 🔑 Environment variables
 
-### Frontend (.env.local)
+### Frontend (example in `.env.local`):
+
 ```env
-REACT_APP_FIREBASE_URL=https://your-firebase-project.firebaseio.com/Views.json
-REACT_APP_FIREBASE_BUILT_URL=https://your-firebase-project.firebaseio.com/ResumesBuilt.json
+VITE_API_BASE_URL=http://localhost:5000
 ```
 
-### AI Backend (AIBackend/.env)
+- Backend (`backend/.env`):
+
 ```env
-GEMINI_API_KEY=your_gemini_api_key_here
+GROQ_API_KEY=your_groq_api_key_here
+PORT=5000
+FLASK_ENV=development
 ```
 
+Note: Never commit real keys. Add `backend/.env` and any local env files to `.gitignore`.
 
 ---
 
@@ -192,33 +178,16 @@ GEMINI_API_KEY=your_gemini_api_key_here
 
 ---
 
-## 🤖 AI Features
-
-### Gemini AI Integration
-The application uses Google's Gemini API to provide:
-
-- **Resume Enhancement** - Improve content quality and formatting
-- **Skill Suggestions** - Suggest relevant skills based on job title
-- **Description Generation** - Create professional summaries
-- **ATS Optimization** - Ensure keywords for Applicant Tracking Systems
-- **Feedback & Analysis** - Detailed resume evaluation
-
-
-
----
-
 ## 👥 Development Team
 
 ### **Prashant Parshuramkar**
 - **GitHub:** [PrashantPKP](https://github.com/PrashantPKP)
-- **LinkedIn:** [Prashant Parshuramkar](https://www.linkedin.com/in/prashantparshuramkar9623/)
-- **Portfolio:** [https://prashantparshuramkar.host20.uk/](https://prashantparshuramkar.host20.uk/)
+- **LinkedIn:** [Prashant Parshuramkar](https://www.linkedin.com/in/prashantpkp/)
 - **Email:** [parshuramkarprashant64@gmail.com](mailto:parshuramkarprashant64@gmail.com)
-
 
 ---
 
-## 📚 Skills & Technologies Supported
+## � Skills & Technologies Supported
 
 The resume builder supports hundreds of skills including:
 - Programming Languages: Python, JavaScript, Java, C++, Go, Rust, TypeScript, etc.
@@ -228,7 +197,6 @@ The resume builder supports hundreds of skills including:
 - DevOps & Tools: Docker, Kubernetes, Jenkins, GitHub Actions, Git, etc.
 - And many more...
 
-
 ---
 
 ## 📄 License
@@ -237,12 +205,10 @@ This project is open-source and available under the MIT License.
 
 ---
 
-
-
 ## 📞 Support & Feedback
 
-Have questions or feedback? Reach out :
-- **Prashant:** [Email](mailto:prashantparshuramkar9146@gmail.com)
+Have questions or feedback? Reach out:
+- **Email:** [parshuramkarprashant64@gmail.com](mailto:parshuramkarprashant64@gmail.com)
 
 ---
 
@@ -258,6 +224,7 @@ Future enhancements:
 - [ ] Mobile app version
 
 ---
+
 ## 🤝 Contributing
 
 Contributions are welcome! Feel free to:
@@ -268,7 +235,7 @@ Contributions are welcome! Feel free to:
 5. Open a Pull Request
 
 ---
+
 **Made with ❤️ by Prashant Parshuramkar**
 
-© 2026 All rights reserved | [Live Demo](https://resume.zapsas.info/)
----
+© 2026 All rights reserved
