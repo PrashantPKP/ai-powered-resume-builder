@@ -213,7 +213,7 @@ The application uses Google's Gemini API to provide:
 - **GitHub:** [PrashantPKP](https://github.com/PrashantPKP)
 - **LinkedIn:** [Prashant Parshuramkar](https://www.linkedin.com/in/prashantparshuramkar9623/)
 - **Portfolio:** [https://prashantparshuramkar.host20.uk/](https://prashantparshuramkar.host20.uk/)
-- **Email:** [prashantparshuramkar9146@gmail.com](mailto:prashantparshuramkar9146@gmail.com)
+- **Email:** [parshuramkarprashant64@gmail.com](mailto:parshuramkarprashant64@gmail.com)
 
 
 ---
@@ -270,5 +270,5 @@ Contributions are welcome! Feel free to:
 ---
 **Made with ❤️ by Prashant Parshuramkar**
 
-© 2025 All rights reserved | [Live Demo](https://resume.zapsas.info/)
+© 2026 All rights reserved | [Live Demo](https://resume.zapsas.info/)
 ---
