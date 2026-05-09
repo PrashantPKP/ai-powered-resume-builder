@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { MessageCircle, Send, X, Bot, User, Sparkles, HelpCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
+import { API_URLS } from '../config/api';
 
 const ChatBot = ({ isOpen, onToggle, currentSection = 'general', userData = {} }) => {
   const [messages, setMessages] = useState([
@@ -57,7 +58,7 @@ const ChatBot = ({ isOpen, onToggle, currentSection = 'general', userData = {} }
         completionLevel: calculateFormCompletion()
       };
 
-      const response = await fetch('http://localhost:5001/chatbot', {
+      const response = await fetch(API_URLS.AI_CHATBOT, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

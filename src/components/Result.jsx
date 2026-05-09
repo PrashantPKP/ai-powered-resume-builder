@@ -1,6 +1,7 @@
 
 
 import React, { useState, useEffect, useRef } from 'react';
+import resumeIcon from '../assets/resume-icon.png';
 import toast from "react-hot-toast";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { html as html_beautify } from 'js-beautify';
@@ -26,9 +27,6 @@ const Result = () => {
   const selectedTemplate = jsonData?.selectedTemplate || "1";
   const MAX_RETRIES = 3;
   const RETRY_DELAY = 10000; 
-
-  // Use environment variable for Firebase URL
-  // const FIREBASE_URL = process.env.REACT_APP_FIREBASE_BUILT_URL || "https://your-firebase-url.firebaseio.com/ResumesBuilt.json";
 
   useEffect(() => {
     if (!jsonData) {
@@ -72,7 +70,7 @@ const Result = () => {
               ${Css}
             </style>
             <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-            <link rel="icon" href="hhttps://prashantparshuramkar.host20.uk/cv-templates/resume-icon.png">
+            <link rel="icon" href={resumeIcon}>
           </head>
           <body>
             ${unformattedHTML.innerHTML}
@@ -89,7 +87,8 @@ const Result = () => {
       setStatus('processing');
   
       try {
-        const response = await fetch("https://html2pdf-backend.onrender.com/generate-pdf", {
+        const apiUrl = `${import.meta.env.VITE_API_BASE_URL}/api/pdf/generate-pdf`;
+        const response = await fetch(apiUrl, {
 
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -211,29 +210,6 @@ const Result = () => {
       setStatus('waking');
       generateAndDownloadFiles();
     }, 1000);
-
-    // Firebase update disabled - use environment variables instead
-    // Updating resume count
-    /*
-    fetch(FIREBASE_URL)
-    .then(res => res.json())
-    .then(current => {
-      const updated = (current || 0) + 1;
-
-      return fetch(FIREBASE_URL, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(updated),
-      }).then(() => {
-        // setResumesBuilt(updated);  // update UI
-      });
-    })
-    .catch(error => {
-      console.error("Error updating resume count:", error);
-    });
-    */
   };
 
   return (

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Lightbulb, RefreshCw, Copy, CheckCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
+import { API_URLS } from '../config/api';
 
 const AISuggestions = ({ jobTitle = '', userData = {}, onApplySuggestion }) => {
   const [suggestions, setSuggestions] = useState([]);
@@ -14,7 +15,7 @@ const AISuggestions = ({ jobTitle = '', userData = {}, onApplySuggestion }) => {
     setError(null);
     
     try {
-      const response = await fetch('http://localhost:5001/generate-profile-suggestions', {
+      const response = await fetch(API_URLS.AI_GENERATE_SUGGESTIONS, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

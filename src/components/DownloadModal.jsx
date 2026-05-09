@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import resumeIcon from '../assets/resume-icon.png';
 import { Download, FileText, Code, Database, X, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -87,10 +88,72 @@ const DownloadModal = ({ isOpen, onClose, resumeData, selectedTemplate }) => {
       iframe.style.visibility = 'hidden';
       document.body.appendChild(iframe);
       
-      // Write content to iframe
+      // Write content to iframe with enhanced print CSS
       const iframeDoc = iframe.contentWindow.document;
       iframeDoc.open();
-      iframeDoc.write(htmlContent);
+      
+      // Add enhanced print CSS for multi-page support
+      const enhancedHTML = htmlContent.replace(
+        '</style>',
+        `
+  /* Enhanced Print Styles for Multi-Page Support */
+  @media print {
+    @page {
+      size: A4;
+      margin: 10mm 10mm 10mm 10mm;
+    }
+    
+    * {
+      -webkit-print-color-adjust: exact !important;
+      print-color-adjust: exact !important;
+      color-adjust: exact !important;
+    }
+    
+    body {
+      width: 100% !important;
+      height: auto !important;
+      max-width: none !important;
+      overflow: visible !important;
+    }
+    
+    .resume {
+      width: 100% !important;
+      height: auto !important;
+      min-height: auto !important;
+      max-height: none !important;
+      overflow: visible !important;
+      page-break-after: auto !important;
+    }
+    
+    /* Allow content to break across pages */
+    .section, .education, .work-experience, .projects, 
+    .Conts, .Skills, .Certificats, .experience-item {
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+    }
+    
+    /* Prevent orphans and widows */
+    p, li, div {
+      orphans: 3 !important;
+      widows: 3 !important;
+    }
+    
+    /* Allow sections to break if needed */
+    .Ritem, .Projects-items, .project-item {
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+    }
+    
+    /* Ensure proper spacing between pages */
+    h1, h2, h3, h4, h5, h6 {
+      page-break-after: avoid !important;
+      break-after: avoid !important;
+    }
+  }
+</style>`
+      );
+      
+      iframeDoc.write(enhancedHTML);
       iframeDoc.close();
       
       // Wait for content to load, then trigger print
@@ -223,7 +286,7 @@ const DownloadModal = ({ isOpen, onClose, resumeData, selectedTemplate }) => {
       ${templateCss}
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="icon" href="https://prashantparshuramkar.host20.uk/cv-templates/resume-icon.png">
+    <link rel="icon" href="${resumeIcon}">
 </head>
 <body>
     ${templateHTML}

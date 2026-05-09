@@ -295,6 +295,9 @@ export const T2 = ({ jsonData }) => {
             <ul>
               <li><h4 className="fontlight">{proj?.projectTitle || 'Project Title'}</h4></li>
               <p dangerouslySetInnerHTML={{ __html: parseMarkdown(proj?.toolsTechUsed || 'Technologies used') }} />
+              {proj?.projectDescription && (
+                <p style={{ marginTop: '5px', fontSize: '0.95em' }} dangerouslySetInnerHTML={{ __html: parseMarkdown(proj.projectDescription) }} />
+              )}
             </ul>  
           </div>
         ))}
@@ -380,25 +383,30 @@ export const T2Css=`
         
         @page {
          size: A4 portrait;
-         margin: 0;
+         margin: 10mm;
         }
         
         .resume-container {
-          width: 210mm !important;
-          max-width: 210mm !important;
-          height: 297mm !important;
-          max-height: 297mm !important;
-          margin: 0 auto !important;
+          width: 100% !important;
+          max-width: 100% !important;
+          height: auto !important;
+          min-height: auto !important;
+          max-height: none !important;
+          margin: 0 !important;
           background: #E5E7EB !important;
           border: none !important;
           border-radius: 0 !important;
           box-shadow: none !important;
-          padding: 15mm !important;
-          page-break-after: avoid !important;
-          overflow: hidden !important;
+          padding: 1.5rem !important;
+          page-break-after: auto !important;
+          overflow: visible !important;
         }
         
-        .header, .section {
+        .header, .section, .summary, .skills, .experience, .projects, .education {
+          page-break-inside: avoid !important;
+        }
+        
+        .experience-item, .project-item, .education-item {
           page-break-inside: avoid !important;
         }
       }

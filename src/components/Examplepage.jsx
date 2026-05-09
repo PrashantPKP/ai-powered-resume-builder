@@ -4,12 +4,12 @@ import React, { useState, useEffect, useRef } from 'react';
 
 const Examplepage = ({ 
   images = [
-      '/Resume-builder/Temp/cv1.png',
-      '/Resume-builder/Temp/cv2.png',
-      '/Resume-builder/Temp/cv3.png',
-      '/Resume-builder/Temp/cv4.png',
-      '/Resume-builder/Temp/cv5.png',
-      '/Resume-builder/Temp/cv6.png'
+      '/Temp/cv1.webp',
+      '/Temp/cv2.webp',
+      '/Temp/cv3.webp',
+      '/Temp/cv4.webp',
+      '/Temp/cv5.webp',
+      '/Temp/cv6.webp'
     ], 
   interval = 3000,
   showIndicators = true 

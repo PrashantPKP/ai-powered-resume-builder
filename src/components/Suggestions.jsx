@@ -11,6 +11,7 @@ const AutoSuggestInput = ({
   isPara=false,
   isTextArea=false,
   isMultiSuggestion = true,
+  showSkillTags = false,
 }) => {
   const [inputValue, setInputValue] = useState(value || "");
   const [filteredSuggestions, setFilteredSuggestions] = useState([]);
@@ -81,12 +82,57 @@ const AutoSuggestInput = ({
     setShowSuggestions(false);
   };
 
+  const removeSkill = (skillToRemove) => {
+    const skills = inputValue.split(',').map(s => s.trim()).filter(s => s !== '');
+    const updatedSkills = skills.filter(skill => skill !== skillToRemove);
+    const newValue = updatedSkills.join(', ');
+    setInputValue(newValue);
+    onChange(newValue);
+  };
+
+  const getSkillsArray = () => {
+    if (!inputValue) return [];
+    return inputValue.split(',').map(s => s.trim()).filter(s => s !== '');
+  };
+
   return (
     <div className="relative space-y-2">
       {label && (
         <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
           {label}
         </label>
+      )}
+      
+      {showSkillTags && getSkillsArray().length > 0 && (
+        <div className="flex flex-wrap gap-2 p-2 bg-gray-50 dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-600">
+          {getSkillsArray().map((skill, index) => (
+            <div
+              key={index}
+              className="group relative flex items-center gap-1 px-3 py-1 bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 rounded-full text-sm font-medium hover:bg-blue-200 dark:hover:bg-blue-800 transition-colors"
+            >
+              <span>{skill}</span>
+              <button
+                type="button"
+                onClick={() => removeSkill(skill)}
+                className="ml-1 opacity-0 group-hover:opacity-100 transition-opacity duration-200 text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300 focus:outline-none"
+                title="Remove skill"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-4 w-4"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+              </button>
+            </div>
+          ))}
+        </div>
       )}
       {isTextArea ? (
         <textarea

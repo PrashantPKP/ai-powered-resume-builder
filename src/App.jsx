@@ -8,40 +8,16 @@ import PreviewPage from './components/PreviewPage.jsx';
 import AboutUs from './components/AboutUs.jsx';
 import { Toaster } from "react-hot-toast";
 import { ThemeContext } from './components/ThemeContext.jsx';
-import GoogleVarification from './components/GoogleVarification.jsx';
 import ViewTemplates from './components/ViewTemplates.jsx';
 import HtmlToPdfConverter from './components/HmlToPdf.jsx'
 import FileUploadPage from './components/FileUploadPage.jsx';
 import Loader from './components/Loader.jsx'
 // import T5 from './components/T5.jsx'
 
-// Use environment variable for Firebase URL
-// const FIREBASE_URL = process.env.REACT_APP_FIREBASE_URL || "https://your-firebase-url.firebaseio.com/Views.json";
-
 const App = () => {
 
   const {isDark} = useContext(ThemeContext)
   const [loading, setLoading] = useState(true);
-  const [views, setViews] = useState(0);
-
-  useEffect(() => {
-    // Firebase URL should be set in environment variables
-    // Uncomment the following code after adding REACT_APP_FIREBASE_URL to your .env file
-    /*
-    fetch(FIREBASE_URL)
-      .then(res => res.json())
-      .then(current => {
-        const updated = (current || 0) + 1;
-        
-        fetch(FIREBASE_URL, {
-          method: "PUT",
-          body: JSON.stringify(updated),
-        });
-
-        setViews(updated);
-      });
-    */
-  }, []);
 
   useEffect(() => {
     if (isDark) {
@@ -69,9 +45,8 @@ const App = () => {
     <div>
       <Toaster />
       <Routes>
-        <Route path="/" element={<FrontPage views={views}/>} />
+        <Route path="/" element={<FrontPage />} />
         <Route path="/AboutUs" element={<AboutUs />} />
-        <Route path="/VarifyMail" element={<GoogleVarification />} />
         <Route path="/FileUploadPage" element={<FileUploadPage />} />
         <Route path="/HTML-PDF" element={<HtmlToPdfConverter />} />
         <Route path="/GetInfo" element={<GetInfo />} />

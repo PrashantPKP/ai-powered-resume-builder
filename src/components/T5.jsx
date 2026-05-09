@@ -232,6 +232,9 @@ export const T5 = ({ jsonData, desc }) => {
               <b>{proj.projectTitle}</b>
             </h4>
             <p style={{ marginLeft: "24px", marginTop: "4px" }} dangerouslySetInnerHTML={{ __html: parseMarkdown(proj.toolsTechUsed) }} />
+            {proj.projectDescription && (
+              <p style={{ marginLeft: "24px", marginTop: "4px", fontSize: "0.9em" }} dangerouslySetInnerHTML={{ __html: parseMarkdown(proj.projectDescription) }} />
+            )}
           </div>
         ))}
       </div>
@@ -291,24 +294,29 @@ export const T5Css=`
   
   @page {
    size: A4 portrait;
-   margin: 0;
+   margin: 10mm;
   }
   
  .resume-container {
-   width: 210mm !important;
-   max-width: 210mm !important;
-   height: 297mm !important;
-   max-height: 297mm !important;
-   margin: 0 auto !important;
+   width: 100% !important;
+   max-width: 100% !important;
+   height: auto !important;
+   min-height: auto !important;
+   max-height: none !important;
+   margin: 0 !important;
    background: #fff !important;
    border-radius: 0 !important;
    box-shadow: none !important;
-   padding: 15mm !important;
-   page-break-after: avoid !important;
-   overflow: hidden !important;
+   padding: 0 !important;
+   page-break-after: auto !important;
+   overflow: visible !important;
  }
  
- .header, .section {
+ .header, .section, .summary, .skills, .experience, .projects, .education-section, .Certifications {
+   page-break-inside: avoid !important;
+ }
+ 
+ .experience-item, .project-item, .education-item, .Certificate-item {
    page-break-inside: avoid !important;
  }
 }

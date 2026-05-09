@@ -22,36 +22,40 @@ const StyledWrapper = styled.div`
     line-height: 1.25;
     padding: 0;
     background-color: #f1f1f1 !important;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
+    display: block;
+    min-height: auto;
   }
   @page {
    size: A4; 
    margin: 0.5in;
   }
   .resume {
-    margin-top: 10px;
-    width: 900px; 
-    max-width: 100%;
-    border-radius: 15px;
-    border: 0px solid #ddd !important;
+    margin: 0;
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 0;
+    border: none !important;
     padding: 20px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    page-break-inside: avoid;
+    box-shadow: none;
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+    page-break-after: auto !important;
   }
-  .section {
+  .section, .header, .summary, .skills, .experience, .projects, .education {
     page-break-inside: avoid;
     break-inside: avoid;
   }
-  .experience-item, .project-item {
+  .experience-item, .project-item, .education-item {
     page-break-inside: avoid;
     break-inside: avoid;
     margin-bottom: 15px;
   }
   .page-break {
     page-break-before: always;
+  }
+  h1, h2, h3 {
+    page-break-after: avoid;
   }
 }
 
@@ -311,6 +315,9 @@ export const T1 = ({ jsonData }) => {
       <li>
         <div className="item-title TextLight">{proj.projectTitle}</div>
         <div dangerouslySetInnerHTML={{ __html: parseMarkdown(proj.toolsTechUsed) }} />
+        {proj.projectDescription && (
+          <div style={{ marginTop: '5px', fontSize: '0.9em' }} dangerouslySetInnerHTML={{ __html: parseMarkdown(proj.projectDescription) }} />
+        )}
       </li>
     </div>
   ));
@@ -463,21 +470,22 @@ export const T1Css=`
       
       @page {
        size: A4 portrait;
-       margin: 0;
+       margin: 10mm;
       }
       
       .resume {
-        width: 210mm !important;
-        max-width: 210mm !important;
-        height: 297mm !important;
-        max-height: 297mm !important;
-        margin: 0 auto !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        min-height: auto !important;
+        max-height: none !important;
+        margin: 0 !important;
         border-radius: 0 !important;
         border: none !important;
-        padding: 15mm !important;
+        padding: 0 !important;
         box-shadow: none !important;
-        page-break-after: avoid !important;
-        overflow: hidden !important;
+        page-break-after: auto !important;
+        overflow: visible !important;
       }
       
       .header, .section {

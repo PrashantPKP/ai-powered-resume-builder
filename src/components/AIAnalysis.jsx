@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { BarChart3, Target, TrendingUp, AlertCircle, CheckCircle, Zap, Brain } from 'lucide-react';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
+import { API_URLS } from '../config/api';
 
 const AIAnalysis = ({ resumeData, jobTitle }) => {
   const [analysis, setAnalysis] = useState(null);
@@ -11,7 +12,7 @@ const AIAnalysis = ({ resumeData, jobTitle }) => {
   const analyzeResume = async () => {
     setIsAnalyzing(true);
     try {
-      const response = await fetch('http://localhost:5001/suggest-improvements', {
+      const response = await fetch(API_URLS.AI_SUGGEST_IMPROVEMENTS, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

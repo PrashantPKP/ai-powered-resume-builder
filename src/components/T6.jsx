@@ -171,6 +171,9 @@ export const T6 = ({ jsonData }) => {
               <li>
                 <div className="item-title">{proj.projectTitle}</div>
                 <div dangerouslySetInnerHTML={{ __html: parseMarkdown(proj.toolsTechUsed) }} />
+                {proj.projectDescription && (
+                  <div style={{ marginTop: '5px', fontSize: '0.9em' }} dangerouslySetInnerHTML={{ __html: parseMarkdown(proj.projectDescription) }} />
+                )}
               </li>
             </div>
           ))}
@@ -246,25 +249,30 @@ export const T6Css=`
   
   @page {
    size: A4 portrait;
-   margin: 0;
+   margin: 10mm;
   }
   
   .resume {
-     width: 210mm !important;
-     max-width: 210mm !important;
-     height: 297mm !important;
-     max-height: 297mm !important;
+     width: 100% !important;
+     max-width: 100% !important;
+     height: auto !important;
+     min-height: auto !important;
+     max-height: none !important;
      background: #F1F5F9 !important;
      border: none !important;
      border-radius: 0 !important;
-     padding: 15mm !important;
+     padding: 0 !important;
      box-shadow: none !important;
-     margin: 0 auto !important;
-     page-break-after: avoid !important;
-     overflow: hidden !important;
+     margin: 0 !important;
+     page-break-after: auto !important;
+     overflow: visible !important;
   }
   
-  .header, .section {
+  .header, .section, .Conts, .contacts, .skills, .title {
+    page-break-inside: avoid !important;
+  }
+  
+  .Ritem, .experience-item, .project-item {
     page-break-inside: avoid !important;
   }
 }

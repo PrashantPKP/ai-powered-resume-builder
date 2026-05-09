@@ -249,6 +249,9 @@ export const T3 = ({jsonData}) => {
                     <li>
                       <div className="item-title TextLight">{proj.projectTitle} </div>
                       <div dangerouslySetInnerHTML={{ __html: parseMarkdown(proj.toolsTechUsed) }} />
+                      {proj.projectDescription && (
+                        <div style={{ marginTop: '5px', fontSize: '0.9em' }} dangerouslySetInnerHTML={{ __html: parseMarkdown(proj.projectDescription) }} />
+                      )}
                     </li>
                   </div>
                 ))}
@@ -353,34 +356,90 @@ export const T3Css=`
   
   @page {
    size: A4 portrait;
-   margin: 0;
+   margin: 10mm;
   }
   
   .resume {
-    width: 210mm !important;
-    max-width: 210mm !important;
-    height: 297mm !important;
-    max-height: 297mm !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
     background: #ffffff !important;
     border-radius: 0 !important;
-    padding: 15mm !important;
+    padding: 0 !important;
     box-shadow: none !important;
-    margin: 0 auto !important;
-    page-break-after: avoid !important;
-    overflow: hidden !important;
+    margin: 0 !important;
+    page-break-after: auto !important;
+    overflow: visible !important;
   }
   
   .header {
     text-align: center;
     width: auto !important;
     background: #b6dbf0 !important;
-    padding: 30mm 5mm !important;
+    padding: 60px 20px !important;
     border-radius: 0 !important;
     margin-bottom: 0 !important;
     page-break-inside: avoid !important;
   }
   
-  .section {
+  .resume {
+    padding: 20px !important;
+  }
+  
+  .section, .SUsection {
+    margin-bottom: 15px !important;
+  }
+  
+  .section-title {
+    font-size: 18px !important;
+    margin-bottom: 8px !important;
+    padding-bottom: 5px !important;
+  }
+  
+  .content {
+    margin-top: 15px !important;
+  }
+  
+  .content .left {
+    padding-right: 10px !important;
+  }
+  
+  .content .right {
+    margin-left: 10px !important;
+  }
+  
+  .Contact {
+    margin-bottom: 15px !important;
+  }
+  
+  .Contact div {
+    margin-bottom: 4px !important;
+  }
+  
+  ul {
+    margin: 8px 0 !important;
+    padding-left: 18px !important;
+  }
+  
+  ul li {
+    margin-bottom: 4px !important;
+  }
+  
+  .mbb-3 {
+    margin-bottom: 10px !important;
+  }
+  
+  .mb-2 {
+    margin-bottom: 6px !important;
+  }
+  
+  .section, .SUsection, .Contact, .content .left, .content .right {
+    page-break-inside: avoid !important;
+  }
+  
+  .Ritem, .Litem, .experience-item, .project-item {
     page-break-inside: avoid !important;
   }
 }
